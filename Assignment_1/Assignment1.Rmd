@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
 
-Authors: Name1 (studentID1) and Name2 (studentID2)
+Authors: Abhishek Dhir (87603866) and Alica Zhang (52721552)
 
 Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
 
@@ -63,7 +63,8 @@ When using terminal, paths work as the addresses of the files and directories yo
 
 ```{bash, eval=FALSE}
 #?# Check your current directory's path: 0.5 pt
-
+pwd
+"/home/adhir_bmeg22"
 
 
 ```
@@ -75,7 +76,7 @@ When using terminal, paths work as the addresses of the files and directories yo
 
 #?# On your home directory create a new directory (folder) - 1pt
 ## This folder will host the files created throughout this assignment 
-
+mkdir assignment1
 
 ```
 
@@ -100,7 +101,7 @@ Access your newly created directory
 ```{bash, eval=FALSE}
 #?# Type the command you need to use to move to your newly created directory - 0.5 pt 
 ## Tip: look at the *cd* command documentation
-
+cd assignment1
 
 ```
 
@@ -112,9 +113,9 @@ How would you move back to your home directory (*/home/your_user_name*)?
 #Check the tutorial: https://www.computerhope.com/unix/ucd.htm 
 
 #?# Using the complete directory path of your home directory: - 0.25 pt
-
+cd /home/adhir_bmeg22
 #?# Using the "go to parent directory" shortcut - 0.25
-
+cd
 
 ```
 
@@ -128,12 +129,15 @@ The sequencing data that we will be using is paired-end. This means that each se
 
 #?# Look at the first 3 rows of the dataset - 0.25
 # Tip: look at the *head* command documentation 
+head -n 3 input_iPSC_SRA66_subset_2.fastq
+
 
 #?# Look at the last 7 rows of the dataset - 0.25
 # Tip: look at the *tail* command documentation 
+tail -n 7 input_iPSC_SRA66_subset_2.fastq
 
 #?# Explore the file with the *less* command  - 0.25
-
+less input_iPSC_SRA66_subset_2.fastq 
 
 ```
 
@@ -145,18 +149,22 @@ Because this is a very large dataset we will proceed to subset it in order to ma
 
 #?# How many lines does the file was in total? - 0.25
 #Tip: loop at the *wc* command documentation
+wc input_iPSC_SRA66_subset_2.fastq
+"10459640"
 
 
 #?# Select only the id lines (e.g. @SRR12506919.667552 667552 length=151) of the dataset (the ones that start with @ and are followed by the read id) - 0.75 pt
 ## Tip: look at the *grep* command
+grep "^@" input_iPSC_SRA66_subset_2.fastq
 
 #?# How many reads are in the file (i.e., how many id lines are in the file)? - 1 pt
 ## Tip: Try using * | head * after the command line you use for the previous question
-
+grep -c "^@" input_iPSC_SRA66_subset_2.fastq
+"2614910"
 
 #?# Select only the reads id (e.g. @SRR12506919.667552) from the id lines - 1 pt
 ## Tip: Look into the *cut* command. Carefully read the default delimiter, is it the case for our file?
-
+grep  "^@" input_iPSC_SRA66_subset_2.fastq | cut -d '.' -f 1,3
 
 ```
 
@@ -167,14 +175,25 @@ Because this is a very large dataset we will proceed to subset it in order to ma
 ```{bash, eval=FALSE}
 
 #?# Save a file that contains only the reads ids (the result of our previous exercise). - 0.5 pt
-
+grep  "^@" input_iPSC_SRA66_subset_2.fastq | cut -d '.' -f 1,3 > /home/adhir_bmeg22/assignment1/output.txt
 
 #?# Now, list all the files in a directory: 
-
+cd && ls assignment1/
 
 #?# What do you see? Was the subset file created correctly? - 0.25 pt
 ## ----
-
+"output.txt"
+`head output.txt` outputs
+"@SRR12694366.1000000
+@SRR12694366.10000029
+@SRR12694366.10000035
+@SRR12694366.1000010
+@SRR12694366.1000012
+@SRR12694366.10000151
+@SRR12694366.10000160
+@SRR12694366.1000017
+@SRR12694366.10000172
+@SRR12694366.10000189"
 ```
 
 
@@ -186,12 +205,13 @@ There will be times where you will want to save a copy of a dataset or file befo
 
 #?# Create a copy of the reads ids file - 0.25 pt
 ## Tip: man cp 
+cp output.txt output_backup.txt
 
 #?# Change the name of the backup reads id file - 0.25 pt
 ## Tip: man mv
-
+mv output_backup.txt output_BACKUP.txt
 #?# Delete the copy of the reads id file - 0.25 pt
-
+rm output_BACKUP.txt  
 ```
 
 ## 2. Managing Conda Environments
@@ -206,10 +226,11 @@ Conda is a package and environment manager (*https://docs.conda.io/en/latest/*).
 ## 1. Move to your home directory 
 
 #?# 2. Use the wget command to get the following file: https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh
-
+wget https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh
 
 ## The file extension .sh pertains to a bash script, the script you just downloaded contains all the instructions needed to install Conda to your home directory
 #?# 3. Run the Anaconda3-2021.11-Linux-x86_64.sh bash script. IMPORTANT: say yes to all the steps when prompted! 
+bash Anaconda3-2021.11-Linux-x86_64.sh
 
 
 
@@ -238,7 +259,7 @@ To install them, we will be making use of the conda environments. Conda allows y
 ```{bash, eval=FALSE}
 #?# Create a new conda environment: - 0.5 pt
 # Tip: Consult the previously provide links or consult the conda create help (conda create --help)
-
+conda create --name bmeg400e
 
 ```
 
@@ -251,13 +272,13 @@ Now that the environment has been created, its time to add the packages that we 
 ```{bash, eval=FALSE}
 
 #?# Add fastQC bowtie2 to your conda environment: - 1 pt
-
+conda install -c bioconda bowtie2
 ## Run the following command to install samtools onto your conda environment:
 
 #?# Add screen to your conda environment: - 1pt 
-
+conda install -c conda-forge screen
 #?# Add htop to your conda environment: - 1pt
-
+conda install -c conda-forge htop
 
 ```
 
