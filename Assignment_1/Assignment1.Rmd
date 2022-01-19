@@ -293,6 +293,8 @@ We will use the widely used fastQC software to do a quick inspection of the data
 ```{bash, eval=FALSE}
 
 #?# Run fastQC on the fastq files: - 1pt
+fastqc /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fastq -o .
+fastqc /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -o .
 
 ## In order to open the html files on your web browser you will need to download the files to your computer
 ## Ubuntu/Linux and Mac users: look at the *scp* command
@@ -300,6 +302,8 @@ We will use the widely used fastQC software to do a quick inspection of the data
 
 #?# What can you say about the data quality? - 2 pt 
 # ---
+#The quality of first subset file is better than second subset file. However, both of them can be considered good quality as most of their bases lie in "good" quality scores. Per Sequence quality scores distribution for both the subsets have a peak at around 36, which confirms that, generally, the qualities are good. 
+###Talk about sequence duplication levels as well
 
 ```
   
