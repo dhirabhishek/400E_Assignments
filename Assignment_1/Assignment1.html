@@ -522,6 +522,8 @@ conda install -c conda-forge htop
 <p>We will use the widely used fastQC software to do a quick inspection of the data quality. Once it has ran, it will give you an html report of the quality of the data, that you can open using a web browser. More information on how to read the output can be found here: <em><a href="https://dnacore.missouri.edu/PDF/FastQC_Manual.pdf" class="uri">https://dnacore.missouri.edu/PDF/FastQC_Manual.pdf</a></em> and in the tool’s website.</p>
 <pre class="bash"><code>
 #?# Run fastQC on the fastq files: - 1pt
+fastqc /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fastq -o .
+fastqc /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -o .
 
 ## In order to open the html files on your web browser you will need to download the files to your computer
 ## Ubuntu/Linux and Mac users: look at the *scp* command
@@ -529,6 +531,10 @@ conda install -c conda-forge htop
 
 #?# What can you say about the data quality? - 2 pt 
 # ---
+#The quality of first subset file is better than second subset file. However, both of them can be considered good quality as most of their bases lie in &quot;good&quot; quality scores. Per Sequence quality scores distribution for both the subsets have a peak at around 36, which confirms that, generally, the qualities are good. 
+###Talk about sequence duplication levels as well
+
+TODO
 </code></pre>
 </div>
 <div id="b.-running-a-process-on-the-background-screen" class="section level3">
@@ -564,6 +570,8 @@ exit
 <p>Another way to check on the progress of your runs and the server status is with the <em>htop</em> command. This will open a screen showing all the processes that are being currently being run in the server. Our server only has 2 cpu’s/cores, the green bar next to each code, represents how much of that node it is currently in use. Always make sure to check the processes that are being run before sending yours.</p>
 <pre class="bash"><code>
 #?# Use the htop command to describe the status of the server - 1.5 pt
+#Using the htop command, we can see the processes runinng under the username along with other info that are shown with the processes running such as CPU% being used by that process, MEM% by the process, time since it&#39;s running. There is also the average CPU load that is being displayed.
+htop
 </code></pre>
 </div>
 <div id="d.-genome-indexing---bowtie2" class="section level3">
@@ -590,6 +598,8 @@ bowtie2 -h
 #?# Perform a paired-end alignment of the fastq sequences provided (located here: /projects/bmeg/A1/) to the human genome index build (located here: /projects/bmeg/indexes/hg38/ ) - 2pt
 
 ## Tip: look at the bowtie2 --help or the documentation on the tool website (http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#getting-started-with-bowtie-2-lambda-phage-example)
+
+TODO
 </code></pre>
 </div>
 <div id="f.-viewing-the-alignments" class="section level3">
@@ -601,9 +611,10 @@ bowtie2 -h
 ## Tip: Read the samtools view --help, read carefully for an option that allows you to *count* the results of your search
 
 #?# Number of mapped reads - 1 pt
-
+5195744
 
 #?# Mumber of unmapped reads - 1 pt
+34076
 </code></pre>
 </div>
 </div>
