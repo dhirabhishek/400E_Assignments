@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
 
-Authors: Abhishek Dhir (87603866) and Alica Zhang (52721552)
+Authors: Abhishek Dhir (87603866) and Alice Zhang (52721552)
 
 Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
 
@@ -305,7 +305,7 @@ fastqc /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -o .
 #The quality of first subset file is better than second subset file. However, both of them can be considered good quality as most of their bases lie in "good" quality scores. Per Sequence quality scores distribution for both the subsets have a peak at around 36, which confirms that, generally, the qualities are good. 
 ###Talk about sequence duplication levels as well
 
-TODO
+#From the sequence duplication levels graph for both fastq files we can see that most sequences only occured once, indicating that for most reads we saw the same sequence once. This means our library did not have limited diversity. In addition, for both datasets there were no overrepresented sequences. 
 
 ```
   
@@ -349,7 +349,7 @@ Another way to check on the progress of your runs and the server status is with 
 ```{bash, eval=FALSE}
 
 #?# Use the htop command to describe the status of the server - 1.5 pt
-#Using the htop command, we can see the processes runinng under the username along with other info that are shown with the processes running such as CPU% being used by that process, MEM% by the process, time since it's running. There is also the average CPU load that is being displayed.
+#Using the htop command, we can see the processes running under the username along with other info that are shown with the processes running such as CPU% being used by that process, MEM% by the process, time since it's running. There is also the average CPU load that is being displayed.
 htop
 
 ```
@@ -374,7 +374,6 @@ bowtie2 -h
 ## __________________________________________________________________________________
 #?# Use the hg38 build to create an index of the human genome with bowtie2
 ## Tip: look into the bowtie2-build help (bowtie2-build --help)  - 1.5 pt
-
 
 
 
