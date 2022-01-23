@@ -70,7 +70,7 @@ As you might have seen on the overview we will be using lots of new tools today.
 ```{bash, eval=FALSE}
 
 #?# Add sambamba to your conda environment created on assignment 1 - 1pt
-
+conda install -c bioconda sambamba
 
 
 ## Note: to complete this assignment, it is expected that your conda environment already has installed: fastqc, bowtie2 and samtools 
@@ -93,12 +93,15 @@ Similarly to the last assignment, we need to make sure that the data has a good 
 
 
 #?# Type below the command that you used to perform the fastqc analysis on the paired-end iPSC input files: - 0.5 pt
+fastqc /projects/bmeg/A2/input_iPSC_SRA66_subset_1.fastq.gz -o .
+fastqc /projects/bmeg/A2/input_iPSC_SRA66_subset_2.fastq.gz -o .
 
 ## Copy the html output file to your computer, open it and write below what can you tell about the data quality of these files.
 ## You can reference fastqc documentation if in doubt.
 
 #?# Are there any differences between the files for read 1 and read 2? Describe what you see below: - 1.5 pt
-## -
+## - 
+#TODO
 ## -
 
 
@@ -119,7 +122,7 @@ Similarly to the last assignment, we need to make sure that the data has a good 
 #?# Perform a paired-end alignment of the iPSC input fastq sequences to the human genome using bowtie2 - 1.5 pt
 ## Use the previously created index located in: /projects/bmeg/indexes/hg38/hg38_bowtie2_index 
 
-
+bowtie2 -x hg38_bowtie2_index -1 /projects/bmeg/A2/input_iPSC_SRA66_subset_1.fastq.gz-2 /projects/bmeg/A2/input_iPSC_SRA66_subset_2.fastq.gz -S /home/adhir_bmeg22/ass2/align.sam
 
 
 ## Tip: look at the bowtie2 --help or the documentation on the tool website (http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#getting-started-with-bowtie-2-lambda-phage-example)
@@ -133,7 +136,7 @@ Next we must convert the sam files made by bowtie2 to bam files, which are much 
 ```{bash, eval=FALSE}
 #?# Using *samtools view*, convert the sam file containing the result of the alignment of the iPSC input files to the reference genome (last step output) to bam format - 1.5 pt
 ## Don't forget to include the header! (-h flag)
-
+samtools view -S -b -h align.sam > align.bam
 
 ```
 
@@ -149,25 +152,33 @@ samtools view <step_c_output>.bam | cut -f1,3,4 | head -5
 
 #?# Use the documentation format (# at the beginning of the line) to include the output of the command above (one per line): - 0.5pt
 
-
+#SRR12694366.1000000	chr3	46631857
+#SRR12694366.10000029	chr3	77718984
+#SRR12694366.10000035	chr3	40015604
+#SRR12694366.1000010	chr3	72734670
+#SRR12694366.1000012	chr3	68714513
 
 ## Using *sambamba sort*, sort the bam file that you created on the last step
 ## sambamba sort default will sort the file and build an index that will allow us to look at the reads that mapped to a specific positions in the genome
 #?# Type the command you use below: - 1 pt
+sambamba sort align.bam
 
 
 ## View the read ID, chromosome, and genomic position for the first 5 reads, as before, but this time for the sorted bam file you just made.
 samtools view step_d_output.bam | cut -f1,3,4 | head -5
 
 #?# Use the documentation format (# at the beginning of the line) to include the output of the command above (one per line): 0.5 pt
-
-
-
+#SRR12694366.33624963	chr1	10078
+#SRR12694366.11301296	chr1	75144
+#SRR12694366.33684568	chr1	75213
+#SRR12694366.29454270	chr1	131133
+#SRR12694366.35652721	chr1	132369
 
 #?# What changed between the two files? Describe what is sambamba sort doing. - 1 pt
 ## If needed, you can inspect more of each bam file by increasing the -n parameter for `head` in the above (just don't bother to include more than 5 lines for each in your submission).
 
-
+# It sorting out based on the chromosome and the position of the genome 
+#TODO - dont know what second number is so said genome
 ```
 
 
@@ -181,10 +192,15 @@ Next, we want to create a version of the BAM file that contains only uniquely ma
 ## For this we will make use of the *-F* flag to filter the reads that were mapped and are not duplicates, by adding the following flag:
 ## *  -F "[XS] == null and not unmapped and not duplicate"  *
 ## Important: Remember to add the header (-h flag) and to specify the output file format (-f flag) as bam
+sambamba view -F "[XS] == null and not unmapped and not duplicate" -h --format=bam  align.sorted.bam  > align_sorted_filtered.bam
 
 
 #?# How many reads were there before filtering for uniquely mapped reads? How many are there now? Include the code to answer these questions and the answers to them below.
 
+# Before filtering there were 2222245 reads
+sambamba view -c align.sorted.bam
+#Now, there are 1879160 reads
+sambamba view -F "[XS] == null and not unmapped and not duplicate" -c align.sorted.bam
 
 ```
 
@@ -222,7 +238,8 @@ Now run the following command, where you should replace <taskfile> with the name
 ./runTheseJobsSerially.sh echo <taskfile>
 
 #?# what happened? Enter your answer below - 1 pt
-## --
+## It printed out the sample first line that we previously entered in the task file. 
+
 
 ```
 
@@ -267,13 +284,18 @@ Now run the following:
 ./runTheseJobsSerially.sh ./fastqToFilteredBam.sh <taskfile>
 
 #?# What happened? Enter your answer below - 1 pt
-## --
+## Below is what it is printing when the above command is ran. So it looks like it was performing fastqc on the files we wanted it to run on. 
+## running pipeline for iPSC_input
+##Performing fastqc of sample iPSC_input with the following fastqs:
+##/projects/bmeg/A2/input_iPSC_SRA66_subset_1.fastq.gz  ##/projects/bmeg/A2/input_iPSC_SRA66_subset_2.fastq.gz
 
 #?# Now run that same command again. What happened this time? Why? Answer below.  - 2 pts
-## --
+## -- DId not perform since it has log for it.
 
 #?# What can you do to make it run the same way as it did the first time? Answer below with the command(s) that would make it run the same way as the first time - 2 pts
-## --
+## I would delete the files which end with ".done". The command is provided below
+#TODO, is there any other way?
+rm MyLogDirectory/*.done
 
 ```
 
