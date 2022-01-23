@@ -313,7 +313,7 @@ div.tocify {
 <h1>Authors and contributions</h1>
 <p>Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment. If you worked alone, only the author (e.g. your name and student ID) should be included.</p>
 <p>Authors: Abhishek Dhir (87603866) and Alice Zhang (52721552)</p>
-<p>Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half.</p>
+<p>Contributions: Alice and Abhishek worked together on Abhishek’s computer initially and also used GitHub repo to complete the later parts of the assignment.</p>
 </div>
 <div id="assignment-overview" class="section level1">
 <h1>Assignment Overview</h1>
@@ -530,7 +530,6 @@ fastqc /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -o .
 #?# What can you say about the data quality? - 2 pt 
 # ---
 #The quality of first subset file is better than second subset file. However, both of them can be considered good quality as most of their bases lie in &quot;good&quot; quality scores. Per Sequence quality scores distribution for both the subsets have a peak at around 36, which confirms that, generally, the qualities are good. 
-###Talk about sequence duplication levels as well
 
 #From the sequence duplication levels graph for both fastq files we can see that most sequences only occured once, indicating that for most reads we saw the same sequence once. This means our library did not have limited diversity. In addition, for both datasets there were no overrepresented sequences. 
 </code></pre>
@@ -586,6 +585,8 @@ bowtie2 -h
 ## __________________________________________________________________________________
 #?# Use the hg38 build to create an index of the human genome with bowtie2
 ## Tip: look into the bowtie2-build help (bowtie2-build --help)  - 1.5 pt
+
+bowtie2-build /projects/bmeg/indexes/hg38/hg38.fa output_index
 </code></pre>
 </div>
 <div id="e.-alignment" class="section level3">
@@ -597,7 +598,9 @@ bowtie2 -h
 
 ## Tip: look at the bowtie2 --help or the documentation on the tool website (http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#getting-started-with-bowtie-2-lambda-phage-example)
 
-bowtie2 -x hg38_bowtie2_index -1 /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fastq-2 /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -S /home/adhir_bmeg22/hg38Index.sam
+bowtie2 -x hg38_bowtie2_index -1 /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fastq-2 /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -S /home/adhir_bmeg22/assignment1/align.sam
+
+#Note: the code above was ran in the hg38 directory.
 </code></pre>
 </div>
 <div id="f.-viewing-the-alignments" class="section level3">
@@ -609,10 +612,12 @@ bowtie2 -x hg38_bowtie2_index -1 /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fas
 ## Tip: Read the samtools view --help, read carefully for an option that allows you to *count* the results of your search
 
 #?# Number of mapped reads - 1 pt
-5195744
+samtools view -F 0x04 -c align.sam
+&quot;5195744&quot;
 
 #?# Mumber of unmapped reads - 1 pt
-34076
+samtools view -f 0x04 -c align.sam
+&quot;34076&quot;
 </code></pre>
 </div>
 </div>
