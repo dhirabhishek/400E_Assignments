@@ -232,11 +232,7 @@ wget https://repo.anaconda.com/archive/Anaconda3-2021.11-Linux-x86_64.sh
 #?# 3. Run the Anaconda3-2021.11-Linux-x86_64.sh bash script. IMPORTANT: say yes to all the steps when prompted! 
 bash Anaconda3-2021.11-Linux-x86_64.sh
 
-
-
 ## 4. To finalize the installation you need to log out your current session and log in back to the server
-
-
 
 ```
 
@@ -376,7 +372,6 @@ bowtie2 -h
 ## Tip: look into the bowtie2-build help (bowtie2-build --help)  - 1.5 pt
 
 
-
 ```
 
 ### e. Alignment
@@ -392,7 +387,7 @@ We are working with paired-end data. Thus, you will need to make sure to use bot
 
 ## Tip: look at the bowtie2 --help or the documentation on the tool website (http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml#getting-started-with-bowtie-2-lambda-phage-example)
 
-TODO
+bowtie2 -x hg38_bowtie2_index -1 /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fastq-2 /projects/bmeg/A1/input_iPSC_SRA66_subset_2.fastq -S /home/adhir_bmeg22/hg38Index.sam
 
 ```
 
