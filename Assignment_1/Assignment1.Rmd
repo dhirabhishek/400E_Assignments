@@ -12,6 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+<<<<<<< HEAD
 # Authors and contributions
 
 Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
@@ -21,6 +22,8 @@ Authors: Abhishek Dhir (87603866) and Alice Zhang (52721552)
 Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
 
 
+=======
+>>>>>>> 7d9f1b29baab78324a9f5b099e377eed459f2242
 # Assignment Overview
 
 For this assignment we will be using data from a Chromatin Immunoprecipitation sequencing (ChIP-seq) produced by Choi, Won-Young, et al., (2020). *https://pubmed.ncbi.nlm.nih.gov/33293480/*. This data is part of a series of experiments that aimed to understand the chromatin changes that happen when an induced Pluripotent Stem Cell (iPSC) undergo differentiation towards a Neuronal Progenitor Cell (NPC). The **fastqc** files from this experiment have been pre-downloaded and added to the server, under the following path: **/projects/bmeg/A1/**. The datasets that we will be using for the assignment are in a shared *reading only* location that you can read but ARE NOT allowed to alter. 
@@ -322,8 +325,8 @@ script /dev/null
 # 3. Start a background process with a specific name 
 screen -S background_screen_name 
 
-# 4. Run the process and any commands you wish
-wc -l usr/local/share/data/assignment_1/SRR12506919_1_subset.fastq
+# 4. Run the process and any commands you wish, for example:
+wc -l /projects/bmeg/A1/input_iPSC_SRA66_subset_1.fastq
 
 # 5. Get out of the background screen, you will need to type the following:
 ctrl + A + D 
@@ -354,7 +357,7 @@ htop
 
 ### d. Genome indexing - bowtie2
 
-Now, we will need to create an index of the human genome that bowtie2 will use to map our sequences in the genome. In order to do this, you will need to use the previously downloaded files of the human genome with the desired build (e.g. hg19,hg38), you can find those files within the server here: */usr/local/share/human/*
+Now, we will need to create an index of the human genome that bowtie2 will use to map our sequences in the genome. In order to do this, you will need to use the previously downloaded files of the human genome with the desired build (e.g. hg19,hg38), you can find those files within the server here: */projects/bmeg/indexes/*
 
 **BEFORE RUNNING ANYTHING**: go to the "Other resources" section at the end of the assignment!
 
@@ -427,11 +430,23 @@ Before signing up, we need to make sure that we won't leave behind any big files
 
   1. Make sure to create a Github account of your own. 
 
-  2. Once you have set it up, create a new private repository for the course. 
+  2. Once you have set it up, create a new public repository for the course. 
 
   3. Use the "upload file" option to upload your assignment Rmd to the website. 
 
   4. Upload the link of your github repository where the assignment file is located onto Canvas
+
+
+
+# Authors and contributions
+
+Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
+
+Authors: Name1 (studentID1) and Name2 (studentID2)
+
+Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
+
+
 
 ## Other Resources
 
@@ -442,4 +457,4 @@ Indexes take a lot of computational resources and time to run. The one we need f
 
 ### b. Other
 
-You can get up to 20 points, if you answer all the questions correctly. Make sure to consult the resources given through the assignment, they are meant to make the assignment easier. 
+Make sure to consult the resources given through the assignment, they are meant to make the assignment easier. 

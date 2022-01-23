@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Assignment Overview 
 
-The goal of this assignment is to walk you through the process of creating a pipeline. For this, we will be analyzing the data from the same research article as last time (*https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7772509/*) by Choi, Won-Young, et al. (2020). This research group was looking at how different epigenetic marks changed in an induced Pluripotent Stem Cell (iPSC) when it was differentiated towards a Neuronal Progenitor Cell (NPC). For this assignment, we will be looking at one histone mark (H3K27me3) and its behavior in iPSCs. This data was created by looking at Chromatin Immunoprecipitation sequencing data (ChIP-seq) using an antibody against the H3K27me3 to sequence only the DNA that attached to the epigenetic mark. Then, we can use this data to find out where H3K27me3 marks are located in the genome by mapping the ChIP-seq reads to the genome. However, to make sure we are seeing a true enrichment of a region, we need a control to compare to. This control is called the *input*, which is usually essentially the same proceedure as was applied to the ChIP-seq sample, but with the immunoprecipitation step skipped. By comparing the input to the ChIP data, we can distinguish between noise and true enrichements. For this assignment, we will be finding how H3K27me3 changes when iPSCs undergo differentiation. All fastq files are paired-end and can be found under the following path:**/usr/local/share/data/assignment_2/**. As always, remember not to copy these files to your directory or try to alter them in any way!
+The goal of this assignment is to walk you through the process of creating a pipeline. For this, we will be analyzing the data from the same research article as last time (*https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7772509/*) by Choi, Won-Young, et al. (2020). This research group was looking at how different epigenetic marks changed in an induced Pluripotent Stem Cell (iPSC) when it was differentiated towards a Neuronal Progenitor Cell (NPC). For this assignment, we will be looking at one histone mark (H3K27me3) and its behavior in iPSCs. This data was created by looking at Chromatin Immunoprecipitation sequencing data (ChIP-seq) using an antibody against the H3K27me3 to sequence only the DNA that attached to the epigenetic mark. Then, we can use this data to find out where H3K27me3 marks are located in the genome by mapping the ChIP-seq reads to the genome. However, to make sure we are seeing a true enrichment of a region, we need a control to compare to. This control is called the *input*, which is usually essentially the same proceedure as was applied to the ChIP-seq sample, but with the immunoprecipitation step skipped. By comparing the input to the ChIP data, we can distinguish between noise and true enrichements. For this assignment, we will be finding how H3K27me3 changes when iPSCs undergo differentiation. All fastq files are paired-end and can be found under the following path:**/projects/bmeg/A2/**. As always, remember not to copy these files to your directory or try to alter them in any way!
 
 For iPSC:
 
@@ -34,7 +34,7 @@ We will not be using the NPC data in this assignment.
   b. Mapping the reads to the genome: bowtie2 (*http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml*)
   
   
-  c. Convert sam to bam files: samtools (**)
+  c. Convert sam to bam files: samtools (*http://www.htslib.org/doc/*)
 
 
   d. Sort the alignment files by genomic position: sambamba (*https://lomereiter.github.io/sambamba/docs/sambamba-view.html*)
@@ -46,7 +46,7 @@ We will not be using the NPC data in this assignment.
 
 ## Before we get started
 
-Before we get started we will assume that you have successfully created a Github repository that will host all your future assignments. For this assignment make sure to create a new file under the same repository so that you don't need to make a new one. You can just make a new subdirectory. At the end, all you should need to do is the standard "commit, pull, push" actions when you are done the assignmenty. If you make a new one, rememnber to keep it private and add this accound as a collaborator.
+Before we get started we will assume that you have successfully created a Github repository that will host all your future assignments. For this assignment make sure to create a new file under the same repository so that you don't need to make a new one. You can just make a new subdirectory. At the end, all you should need to do is the standard "commit, pull, push" actions when you are done the assignment. If you make a new one, remember to keep it private and add this accound as a collaborator.
 
 
 All the questions that need to be answered with a command or a written response, from now on, will be marked with **#?#** and be followed by the grading of the question. 
@@ -72,6 +72,7 @@ As you might have seen on the overview we will be using lots of new tools today.
 #?# Add sambamba to your conda environment created on assignment 1 - 1pt
 
 
+
 ## Note: to complete this assignment, it is expected that your conda environment already has installed: fastqc, bowtie2 and samtools 
 
 
@@ -93,7 +94,6 @@ Similarly to the last assignment, we need to make sure that the data has a good 
 
 #?# Type below the command that you used to perform the fastqc analysis on the paired-end iPSC input files: - 0.5 pt
 
-
 ## Copy the html output file to your computer, open it and write below what can you tell about the data quality of these files.
 ## You can reference fastqc documentation if in doubt.
 
@@ -111,11 +111,13 @@ Similarly to the last assignment, we need to make sure that the data has a good 
 
 ### b. Mapping to the reference genome
 
+**IMPORTANT**: This step can take up to ~30mins to run, please be mindful of the resources in the server (use htop) 
+
+
 ```{bash, eval=FALSE}
 
 #?# Perform a paired-end alignment of the iPSC input fastq sequences to the human genome using bowtie2 - 1.5 pt
-## Use the previously created index located in: /usr/local/share/indexes/hg38_bowtie2_index 
-
+## Use the previously created index located in: /projects/bmeg/indexes/hg38/hg38_bowtie2_index 
 
 
 
@@ -161,6 +163,7 @@ samtools view step_d_output.bam | cut -f1,3,4 | head -5
 
 
 
+
 #?# What changed between the two files? Describe what is sambamba sort doing. - 1 pt
 ## If needed, you can inspect more of each bam file by increasing the -n parameter for `head` in the above (just don't bother to include more than 5 lines for each in your submission).
 
@@ -199,30 +202,36 @@ In this section, you will need to edit files on the command line. There are seve
 
 Start by making a tab delimited file with three columns: sampleID, fastqFile1, fastqFile2
 A sample first line is included here:
+
 ```{}
+
 iPSC_input  input_iPSC_SRA66_subset_1.fastq.gz  input_iPSC_SRA66_subset_2.fastq.gz
+
 ```
+
 This will be the list of tasks you want to accomplish. 
 
 ### b. Working with a "job scheduler"
-
 
 Normally we would use a job scheduler to accomplish these tasks, but our server is incapable of using a job scheduler, so instead we're going to use this program (https://raw.githubusercontent.com/BMEGGenoInfo/Assignments/main/Assignment_2/runTheseJobsSerially.sh) that will run a given script for each line in a file. Download it to the server, for instance using `wget`. 
 
 Now run the following command, where you should replace <taskfile> with the name of your file. Note that you may need to run `chmod +x runTheseJobsSerially.sh` to give the script file execute permissions.
   
 ```{bash, eval=FALSE}
+
 ./runTheseJobsSerially.sh echo <taskfile>
+
 #?# what happened? Enter your answer below - 1 pt
+## --
 
 ```
 
 ### c. Your first pipeline
 
-
 Now we want to make a script that will run all the commands you performed above (in Q1), but for any of the samples. Below is a script which you can copy into a new file "fastqToFilteredBam.sh", which you will modify to include all the steps needed to go from a fastq to a sorted, filtered (uniquely mapping only) bam file.
 
 ```{bash, eval=FALSE}
+
 #!/bin/bash
 set -e # this makes the whole script exit on any error.
 #fill these variables with the arguments given to this script
@@ -235,7 +244,7 @@ echo running pipeline for $sample
 if [ ! -e $logDir/$sample.fastqc.done ] #run this code only if $logDir/$sample.fastqc.done is missing
 then
         echo Performing fastqc of sample $sample with the following fastqs:
-        ls /usr/local/share/data/assignment_2/$fq1 /usr/local/share/data/assignment_2/$fq2
+        ls /projects/bmeg/A2/$fq1 /projects/bmeg/A2/$fq2
         
         #enter commands to run fastqc here
         
@@ -243,33 +252,64 @@ then
 else # $logDir/$sample.fastqc.done was not missing
         echo Already performed fastqc of $sample
 fi
+
+
 #here is where you will be including the additional steps to take you from fastq.gz to sorted BAM containing only uniquely mapping reads.
+
 ```
+
 
 Now run the following:
+
 ```{bash, eval=FALSE}
+
 ## Run this with <taskfile> replaced with the name of your task file.
 ./runTheseJobsSerially.sh ./fastqToFilteredBam.sh <taskfile>
+
 #?# What happened? Enter your answer below - 1 pt
+## --
 
 #?# Now run that same command again. What happened this time? Why? Answer below.  - 2 pts
-
+## --
 
 #?# What can you do to make it run the same way as it did the first time? Answer below with the command(s) that would make it run the same way as the first time - 2 pts
+## --
 
 ```
 
+
 ### d. Filling in the pipeline
+
 Now fill in the rest of the pipeline with the tasks you had done for iPSC input, but replace the sample IDs with the variable `$sample`. Include appropriate documentation and messages. Note that it is easier to separate the different parts of a file name with a period (.). For instance, bash will treat the `$sample` in `$sample.sorted.uniqMapping.bam` as the variable `$sample`, whereas `$sample_sorted_uniqMapping.bam` will be interpreted as a new varaible `$sample_sorted_uniqMapping`.
 
 Note that in the script provided, fastqc is not actually run, so you will have to include the code for that too. Everything you needed to do to take the samples from fastq to sorted, uniquely mapping BAM file should be included in this pipeline. You should also build in robustness to failure, comments, and messages (e.g. via `echo`) to describe in the purpose of the code, and to provide updates while the code is running. You should test this script by running it on the two samples (iPSC input, and iPSC ChIP). 
 
+
 ```{bash, eval=FALSE}
 ## Test the script by running this, with your modified pipeline script in place of fastqToFilteredBam.sh
+
 ./runTheseJobsSerially.sh ./fastqToFilteredBam.sh <taskfile>
+
 ```
 
+
 When you are done, enter the code for your pipeline in the space provided below - 10 pts
+
 ```{bash, eval=FALSE}
-## REPLACE THIS WITH YOUR SCRIPT
+
+
+#?# REPLACE THIS WITH YOUR SCRIPT
+
+
 ```
+
+
+# Authors and contributions
+
+Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
+
+Authors: Name1 (studentID1) and Name2 (studentID2)
+
+Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
+
+
