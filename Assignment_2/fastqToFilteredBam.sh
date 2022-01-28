@@ -2,6 +2,7 @@
 #!/bin/bash
 set -e # this makes the whole script exit on any error.
 #fill these variables with the arguments given to this script
+userDir = alzhang_bmeg22
 sample=$1
 fq1=$2
 fq2=$3
@@ -15,8 +16,8 @@ then
 
 
         #enter commands to run fastqc here
-		fastqc /projects/bmeg/A2/$fq1 --outdir=/home/alzhang_bmeg22/assignment2
-		fastqc /projects/bmeg/A2/$fq2 --outdir=/home/alzhang_bmeg22/assignment2
+		fastqc /projects/bmeg/A2/$fq1 --outdir=/home/$userDir/assignment2
+		fastqc /projects/bmeg/A2/$fq2 --outdir=/home/$userDir/assignment2
 
 	
 
@@ -29,7 +30,7 @@ if [ ! -e $logDir/$sample.align.done ]
 then
 		echo Running Alignment for $sample now, please wait around 30 minutes.
 
-		bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -1 /projects/bmeg/A2/$fq1 /projects/bmeg/A2/$fq2 -S /home/alzhang_bmeg22/assignment2/$sample.align.sam
+		bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -1 /projects/bmeg/A2/$fq1 /projects/bmeg/A2/$fq2 -S /home/$userDir/assignment2/$sample.align.sam
         
         touch $logDir/$sample.align.done #create the file that we were looking for at the beginning of this if statement so that this same code is not run next time
 else # $logDir/$sample.fastqc.done was not missing
