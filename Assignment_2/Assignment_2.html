@@ -431,7 +431,7 @@ samtools view align.sorted.bam | cut -f1,3,4 | head -5
 #?# What changed between the two files? Describe what is sambamba sort doing. - 1 pt
 ## If needed, you can inspect more of each bam file by increasing the -n parameter for `head` in the above (just don&#39;t bother to include more than 5 lines for each in your submission).
 
-# It sorting out based on the chromosome and the position of the genome 
+# We used the default sambamba sort (&quot;coordinate&quot; sort order), so it sorted the file by reference name ID (chromosome number), and then within each chromosome number, it sorts based on the start position (1-Based leftmost position of alignment).
 #TODO - dont know what second number is so said genome; find out what the second number means
 </code></pre>
 </div>
@@ -515,10 +515,11 @@ fi
 ./runTheseJobsSerially.sh ./fastqToFilteredBam.sh &lt;taskfile&gt;
 
 #?# What happened? Enter your answer below - 1 pt
-## Below is what it is printing when the above command is ran. So it looks like it was performing fastqc on the files we wanted it to run on. 
+## Below is what it is printing when the above command is ran. So it looks like it was performing fastqc on the files we wanted it to run on. And then it started printing outputs that are printed when running fastqc on a file.
 ## running pipeline for iPSC_input
 ##Performing fastqc of sample iPSC_input with the following fastqs:
 ##/projects/bmeg/A2/input_iPSC_SRA66_subset_1.fastq.gz  ##/projects/bmeg/A2/input_iPSC_SRA66_subset_2.fastq.gz
+
 
 #?# Now run that same command again. What happened this time? Why? Answer below.  - 2 pts
 ## -- DId not perform since it has log for it.
@@ -527,7 +528,7 @@ fi
 ## I would delete the files which end with &quot;.done&quot;. The command is provided below
 #TODO, is there any other way?
 rm MyLogDirectory/*.done
-</code></pre>
+#Alternatively, we can just remove the if statements from the script and it would just overwrite the log files.</code></pre>
 </div>
 <div id="d.-filling-in-the-pipeline" class="section level3">
 <h3>d. Filling in the pipeline</h3>
