@@ -432,7 +432,6 @@ samtools view align.sorted.bam | cut -f1,3,4 | head -5
 ## If needed, you can inspect more of each bam file by increasing the -n parameter for `head` in the above (just don&#39;t bother to include more than 5 lines for each in your submission).
 
 # We used the default sambamba sort (&quot;coordinate&quot; sort order), so it sorted the file by reference name ID (chromosome number), and then within each chromosome number, it sorts based on the start position (1-Based leftmost position of alignment).
-#TODO - dont know what second number is so said genome; find out what the second number means
 </code></pre>
 </div>
 <div id="e.-keep-only-uniquely-mapped-reads" class="section level3">
@@ -451,7 +450,7 @@ sambamba view -F &quot;[XS] == null and not unmapped and not duplicate&quot; -h 
 # Before filtering there were 2222245 reads
 sambamba view -c align.sorted.bam
 #Now, there are 1879160 reads
-sambamba view -F &quot;[XS] == null and not unmapped and not duplicate&quot; -c align.sorted.bam
+sambamba view -c align.sorted_sorted.bam
 </code></pre>
 <p>Now that you have created your BAM files and inspected them, now would be a good time to delete the SAM files that are leftover from your alignment.</p>
 <p>The next step in the process would be calling peaks, but we need both input and ChIP data for each cell type before we can do that and here we have only processed one file. So instead, we will be…</p>
@@ -477,6 +476,7 @@ iPSC_input  input_iPSC_SRA66_subset_1.fastq.gz  input_iPSC_SRA66_subset_2.fastq.
 ./runTheseJobsSerially.sh echo &lt;taskfile&gt;
 
 #?# what happened? Enter your answer below - 1 pt
+./runTheseJobsSerially.sh echo task.txt
 ## It printed out the sample first line that we previously entered in the task file. 
 </code></pre>
 </div>
@@ -499,7 +499,8 @@ then
         ls /projects/bmeg/A2/$fq1 /projects/bmeg/A2/$fq2
         
         #enter commands to run fastqc here
-        
+        fastqc /projects/bmeg/A2/$fq1 --outdir=/home/adhir_bmeg22/ass2
+            fastqc /projects/bmeg/A2/$fq2 --outdir=/home/adhir_bmeg22/ass2
         
         touch $logDir/$sample.fastqc.done #create the file that we were looking for at the beginning of this if statement so that this same code is not run next time
 else # $logDir/$sample.fastqc.done was not missing
@@ -515,18 +516,14 @@ fi
 ./runTheseJobsSerially.sh ./fastqToFilteredBam.sh &lt;taskfile&gt;
 
 #?# What happened? Enter your answer below - 1 pt
-## Below is what it is printing when the above command is ran. So it looks like it was performing fastqc on the files we wanted it to run on. And then it started printing outputs that are printed when running fastqc on a file.
-## running pipeline for iPSC_input
-##Performing fastqc of sample iPSC_input with the following fastqs:
-##/projects/bmeg/A2/input_iPSC_SRA66_subset_1.fastq.gz  ##/projects/bmeg/A2/input_iPSC_SRA66_subset_2.fastq.gz
+## It printed out the echo commands before performing fastqc. When performing fastqc, it printed out the statements that fastqc prints while analyzing a file.
 
 
 #?# Now run that same command again. What happened this time? Why? Answer below.  - 2 pts
-## -- DId not perform since it has log for it.
+##  DId not perform since it has log for it.
 
 #?# What can you do to make it run the same way as it did the first time? Answer below with the command(s) that would make it run the same way as the first time - 2 pts
-## I would delete the files which end with &quot;.done&quot;. The command is provided below
-#TODO, is there any other way?
+## I would delete the files which end with &quot;.done&quot;. The command is provided below:
 rm MyLogDirectory/*.done
 #Alternatively, we can just remove the if statements from the script and it would just overwrite the log files.</code></pre>
 </div>
@@ -579,21 +576,26 @@ else # $logDir/$sample.fastqc.done was not missing
 
 fi
     echo Converting the sam file to bam file now
-    samtools view -S -b -h $sample.align.sam &gt; $sample.align.bam
+    samtools view -S -b -h $sample.align.sam &gt; $sample.align.bam #converting the same file to bam file
 
-    echo Sorting the bam file. And removing the sam file
-    sambamba sort $sample.align.bam
-    rm $sample.align.sam
+    echo Sorting the bam file and the sort file will be saved as $sample.align.sorted.bam.
+    sambamba sort $sample.align.bam #sorting the bam file using sambamba file
+    samtools view $sample.align.sorted.bam | cut -f1,3,4 | head -5 &gt; $sample.clean_sorted.txt # saving the read IDs, chromosome number and position in a text file for the first 5 reads.
+    echo To view first 5 cleaned entries of the sorted file, open the file $sample.clean_sorted.txt
+    echo Deleting the sam file 
+    rm $sample.align.sam # removing the sam file
 
     echo Now, filtering the sorted bam file 
 
-    sambamba view -F &quot;[XS] == null and not unmapped and not duplicate&quot; -h --format=bam  $sample.align.sorted.bam  &gt; $sample.align.sorted.filtered.bam
+    sambamba view -F &quot;[XS] == null and not unmapped and not duplicate&quot; -h --format=bam  $sample.align.sorted.bam  &gt; $sample.align.sorted.filtered.bam # filtering the sorted bam file and saving it as another file
 
     echo The sorted and filtered file is now saved as $sample.align.sorted.filtered.bam
+    samtools view $sample.align.sorted.filtered.bam | cut -f1,3,4 | head -5 &gt; $sample.clean_sorted_filtered.txt # saving the read IDs, chromosome number and position in a text file for the first 5 reads.
+    echo To view first 5 cleaned entries of the sorted and filtered file, open the file $sample.clean_sorted_filtered.txt
 
-    echo The filtered and sorted file has the following reads:
+    echo The filtered and sorted file has the following number of reads:
 
-    sambamba view -c $sample.align.sorted.filtered.bam 
+    sambamba view -c $sample.align.sorted.filtered.bam #calculating the number of reads in the new filtered file.
 </code></pre>
 </div>
 </div>
@@ -602,7 +604,7 @@ fi
 <h1>Authors and contributions</h1>
 <p>Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment. If you worked alone, only the author (e.g. your name and student ID) should be included.</p>
 <p>Authors: Alice Zhang (52721552) and Abhishek Dhir (87603866)</p>
-<p>Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half.</p>
+<p>Contributions: Alice and Abhishek worked together synchronously on the first half of the assignment and then asynchronously completed the second half.</p>
 </div>
 
 
