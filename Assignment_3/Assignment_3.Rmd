@@ -203,7 +203,7 @@ show(barplot)
 
 ## Assignment submission
 
-Please knit your Rmd file to *github_document* and include both in your submission.
+Please knit your Rmd file to *github_document* and include the link to the .md file in your Canvas submission.
 Successful knitting to github_document - 2 pts
 
 
