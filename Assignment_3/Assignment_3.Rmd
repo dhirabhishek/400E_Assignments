@@ -126,7 +126,9 @@ length_mapped_reads.df <- data.frame(reads_length=c(150,100,75,50,25),
 #?# Create a scatterplot using ggplot2 - 2 pt
 ## Use the reads_length for the x axis, uniquely_mapped_reads for the y axis; 
 ## Use the number of uniqquely mapped reads for the y axis
-
+library(ggplot2)
+plot <- ggplot(length_mapped_reads.df, aes(x=reads_length, y=uniquely_mapped_reads)) + geom_point()
+show(plot)
 
 ## Tips:
 ## You can look for tutorials on the internet, or use ggplot2's help to learn how to do this. 
@@ -176,7 +178,7 @@ Your supervisor liked so much the graphical representation of your data, that he
 ## First, we create a dataframe with two columns, one (run_type) for the different run types and another (uniquely_mapped_reads for the number of uniquely mapped reads.
 #?# Substitute the SE and PE with their respective number of uniquely mapped reads that you got from sambamba view: - 1 pt
 sequence_run.df <- data.frame(run_type=c("Single End", "Paired End"),
-                              uniquely_mapped_reads=c(SE,PE))
+                              uniquely_mapped_reads=c(1325510,2686235))
 
 
 
@@ -184,10 +186,12 @@ sequence_run.df <- data.frame(run_type=c("Single End", "Paired End"),
 #?# Using ggplot, create a barplot that shows the different number of uniquely mapped reads between the two run types: - 2 pt
 ## Use the run_type in the x-axis
 ## Use the uniquely_mapped_reads in the y-axis
-
+barplot <- ggplot(data=sequence_run.df, aes(x=run_type, y=uniquely_mapped_reads)) + geom_bar(stat="identity")
+show(barplot)
 
 
 #?# Does the run type makes a difference? If there is, is it large? - 1 pt
+# Yes, it does make a large difference. The paired end has a lot more uniquely mapped reads.
 
 #?# In your own words explain the difference between SE and PE read alignment. - 1 pt
 
