@@ -47,7 +47,7 @@ As always, before we start we will make sure to have all the programs we need to
 ```{bash, eval=FALSE}
 
 #?# Add trimmomatic to your conda environment created on A1 - 0.5 pt
-
+conda install -c bioconda trimmomatic 
 
 ```
 
@@ -65,17 +65,18 @@ As you reviewed in class, the sequence length affects the chances of finding uni
 
 #?# Use trimmomatic SE to crop the file down to 25 bp in length, type the command you use below - 1 pt
 ## Note: Remember to gzip all your files! Look into the trimmomatic documentation for how to specify to compress your output
-
+trimmomatic SE /projects/bmeg/A2/H3K27me3_iPSC_SRA60_subset_1.fastq.gz H3K27me3_iPSC_SRA60_subset_1_bp_25_cropped.fastq.gz CROP:25
 
 #?# Use bowtie2 to map the _25bp_ read file you just created to the reference genome, type the command you use below: - 0.5 pt
-
+bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -U H3K27me3_iPSC_SRA60_subset_1_bp_25_cropped.fastq.gz -S align.sam
 
 #?# Use sambamba view to get the number of uniquely mapped reads of the alignment output you got above,type the command you use below: - 0.5 pt
 ## NOTE: Remember to use the following flag:
 ## -F "[XS] == null and not unmapped and not duplicate"
 ## Tip: Check for the sambamba documentation for options that will allow you to use the sam file as an input and automatically count the number of reads.
 
-
+sambamba view -F "[XS] == null and not unmapped and not duplicate" -S align.sam -c
+"1325510"
 
 ```
 
@@ -94,6 +95,14 @@ You realize that if you want to consider many different read lengths, copying an
 #?# Type the code of your mini pipeline below: - 3 pt
 ## You do not need to build in robustness to failure here since only one command is run with a single numerical output (so it would be hard to miss a failed run). 
 ## Have the pipeline also state the read length being considered before displaying the number of uniquely mapping reads.
+## ----- The script is provided below -------
+#!/bin/bash
+set -e
+bam1=$1
+echo Read length is:
+echo $bam1 | cut -d "_" -f 7 
+echo And the count is: 
+sambamba view -F "[XS] == null and not unmapped and not duplicate" /projects/bmeg/A3/$bam1 -c
 
 
 
@@ -104,9 +113,13 @@ You realize that if you want to consider many different read lengths, copying an
 ./runTheseJobsSerially.sh <your_mini_pipeline> <your_taskfile>
 
 #?# Type the substituted line you used below: - 1.5 pt 
-
+ ./runTheseJobsSerially.sh ./countUnmappedNotDuplicate.sh task.txt 
 #?# Type the content of your taskfile below: - 0.5 pt 
-
+H3K27me3_iPSC_SRA60_subset_1_LEN_150_mapped.bam 
+H3K27me3_iPSC_SRA60_subset_1_LEN_100_mapped.bam
+H3K27me3_iPSC_SRA60_subset_1_LEN_75_mapped.bam
+H3K27me3_iPSC_SRA60_subset_1_LEN_50_mapped.bam
+H3K27me3_iPSC_SRA60_subset_1_bp_25_cropped.bam
 
 ```
 
@@ -116,7 +129,7 @@ Now that you have the number of uniquely mapped reads for the different reads si
 ## First, we create a dataframe with two columns, one (reads_length) for the different read lengths and another (uniquely_mapped_reads for the number of uniquely mapped reads
 #?# Substitute the sequence lengths with their respective number of uniquely mapped reads, that you got from sambamba view: - 1 pt
 length_mapped_reads.df <- data.frame(reads_length=c(150,100,75,50,25),
-                          uniquely_mapped_reads=c(X,X,X,X,X))## Here
+                          uniquely_mapped_reads=c(1571825,1504718,1459162,1401280,1325510))## Here
 
 
 ## If you don't have it already, install the "ggplot2" package on your Rstudio 
@@ -152,20 +165,22 @@ Now that you have proven that the longest read length yields the highest number 
 ## /projects/bmeg/indexes/hg38/hg38_bowtie2_index
 
 #?# Perform a paired-end (PE) analysis, type the command you used below: - 0.5 pt
-
+bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -1 /projects/bmeg/A3/H3K27me3_iPSC_SRA60_subset_1_LEN_25.fastq.gz -2 /projects/bmeg/A3/H3K27me3_iPSC_SRA60_subset_2_LEN_25.fastq.gz -S alignPE.sam
 #?# Do a single-end (SE) analysis of the subset_1 file , type the command you used below: - 0.5 pt
-
+bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -U /projects/bmeg/A3/H3K27me3_iPSC_SRA60_subset_1_LEN_25.fastq.gz -S alignSE.sam
 
 #?# Convert the PE sam file to bam format, type the command you used below: - 0.5 pt
-
+samtools view -S -b -h alignPE.sam > alignPE.bam
 #?# Convert the SE sam file to bam format, type the command you used below: - 0.5 pt
-
+samtools view -S -b -h alignSE.sam > alignSE.bam
 ## Before moving on: remove the PE and SE sam alignment files!
 
 #?# Use sambamba view to get the number of uniquely mapped reads for the PE alignment, type the command you used below: - 0.5 pt 
-
+sambamba view -F "[XS] == null and not unmapped and not duplicate" alignPE.bam -c
+# Count is 2686235
 #?# Use sambamba view to get the number of uniquely mapped reads for the SE alignment, type the command you used below: - 0.5 pt 
-
+sambamba view -F "[XS] == null and not unmapped and not duplicate" alignSE.bam -c
+# Count is 1325510
 
 ```
 

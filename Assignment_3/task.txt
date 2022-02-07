@@ -1,0 +1,5 @@
+H3K27me3_iPSC_SRA60_subset_1_LEN_150_mapped.bam 
+H3K27me3_iPSC_SRA60_subset_1_LEN_100_mapped.bam
+H3K27me3_iPSC_SRA60_subset_1_LEN_75_mapped.bam
+H3K27me3_iPSC_SRA60_subset_1_LEN_50_mapped.bam
+H3K27me3_iPSC_SRA60_subset_1_bp_25_cropped.bam
