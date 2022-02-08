@@ -264,10 +264,18 @@ show(barplot)
 # Yes, it does make a large difference. The paired end has a lot more uniquely mapped reads since more #of each DNA fragment is sequenced.
 
 #?# In your own words explain the difference between SE and PE read alignment. - 1 pt
-#In single end sequencing the DNA fragments are read in the direction from one end to the other, #whereas in paired end sequencing after the first read, the fragment is also read in the other #direction. Thus when the sequences are being aligned, there is usually more overlap across sequences #from the paired end sequences, making it easier to detect gene insertions, deletions, and overlapping #regions for when the sequences are being reassembled and ordered. 
+# ----- Answer ---
+#In single end sequencing the DNA fragments are read in the direction from one end to the other,
+#whereas in paired end sequencing after the first read, the fragment is also read in the other
+#direction. Thus when the sequences are being aligned, there is usually more overlap across sequences
+#from the paired end sequences, making it easier to detect gene insertions, deletions, and overlapping #regions for when the sequences are being reassembled and ordered. 
 
 #?# Given that the 50 bp reads (from last graph) contain the same number of bases as two 25 bp reads (25 bp PE; 25+25=50), why are the number of uniquely mapping reads different between these two? Which has more? Why do you think this is? - 3 pts
-# The paired end read would have more uniquely mapped reads. For paired end reads, a unique mapping #exists when both ends of the sequence are identical to a location in the genome. So there would be #more unique mappings than the single ended, where it's more likely that a read aligns with multiple #locations in the genome. 
+# ----- Answer ---
+# The paired end read would have more uniquely mapped reads. For paired end reads, a unique mapping
+#exists when both ends of the sequence are identical to a location in the genome. So there would be 
+#more unique mappings than the single ended, where it's more likely that a read aligns with multiple 
+#locations in the genome. 
 ```
 
 ## Assignment submission
@@ -284,6 +292,6 @@ included.
 
 Authors: Alice Zhang (52721552) and Abhishek Dhir (87603866)
 
-Contributions: (example) N1 and N2 worked together on the same computer
-to complete the assignment. N1 typed for the first half and N2 typed for
-the second half.
+Contributions: Alice and Abhishek worked together asynchronously on the
+assignment together and then pushed the combined changes in the end,
+after a synchronous working session.
