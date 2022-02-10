@@ -36,9 +36,9 @@ As always, before we get started we will install the tools required for the assi
 ```{bash, eval=FALSE}
 
 #?# Add liftOver to your conda environment created on A1, type the command you used below - 1 pt
-
+conda install -c bioconda ucsc-liftover
 #?# Add bedtools to your conda environment created on A1, type the command you used below - 1 pt
-
+conda install -c bioconda bedtools
 
 ```
 
@@ -60,9 +60,9 @@ Your Professor informs you that the Information and Technology (IT) department w
 
 #?# Perform a single-end alignment using bowtie2 against the pre-made index of the hg38 genome build - 2 pt
 
-
+bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -U /projects/bmeg/A4/SRR12506919_subset.fastq.gz -S align38SE.sam
 #?# Perform a single-end alignment using bowtie2 against the pre-made index of the hg19 genome build - 2 pt
-
+bowtie2 -x /projects/bmeg/indexes/hg19/hg19_bowtie2_index -U /projects/bmeg/A4/SRR12506919_subset.fastq.gz -S align19SE.sam
 
 
 ```
@@ -85,21 +85,21 @@ Before you can start comparing the files, you realize you need to translate them
 
 ## Sam to Bam -------------
 #?# Convert the SE alignment performed against hg19  (hg19 alignment) to bam, type the command you used below -1 pt
-
+samtools view -S -b -h align19SE.sam > align19SE.bam
 #?# Convert the SE alignment performed against hg38 (hg38 alignment) to bam, type the command you used below -1 pt
-
+samtools view -S -b -h align38SE.sam > align38SE.bam
 ## Bam to bed -------------
 ## Tip: Look into the bedtools bamtobed command
 #?# Use bedtools to convert the hg19 alignment bam file to bed format, type the command you used below - 1 pt 
-
+bamToBed -i align19SE.bam > align19SE.bed
 #?# Use bedtools to convert the hg38 alignment bam file to bed format, type the command you used below - 1 pt 
-
+bamToBed -i align38SE.bam > align38SE.bed
 
 ## LiftOver --------------
 #?# Use liftOver to change the hg19 alignment bed file to the hg38 coordinate system, type the command/s you used below - 2 pt
 ## To do this, you will need the "chain file": /projects/bmeg/A4/hg19ToHg38.over.chain.gz
 ## Tip: Look at the liftOver documentation! 
-
+liftOver align19SE.bed /projects/bmeg/A4/hg19ToHg38.over.chain.gz output19SE.bed unlifted.bed
 
 ```
 
@@ -112,10 +112,10 @@ Now that both alignments are on the same coordinate system, they are comparable 
 
 #?# Using bash commands to sort the transformed hg19 alignment file bed alignment file by read name (column 4), type the command you used below - 2 pt
 ## Tip: Look at the sort command!
-
+sort -k 4 -n output19SE.bed | head -3
 #?# Using bash commands, sort the hg38 bed alignment file by read name (column 4), type the command you used below - 2 pt
 ## Tip: Look at the sort command!
-
+sort -k 4 -n align38SE.bed | head -3
 
 ```
 
