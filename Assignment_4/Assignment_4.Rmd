@@ -112,11 +112,11 @@ Now that both alignments are on the same coordinate system, they are comparable 
 
 #?# Using bash commands to sort the transformed hg19 alignment file bed alignment file by read name (column 4), type the command you used below - 2 pt
 ## Tip: Look at the sort command!
-sort -k 4 -n output19SE.bed | head -3
+sort -k 4 -n output19SE.bed | head -3 # I think this should be sort -k4 -o output19SE.bed output19SE.bed 
 #?# Using bash commands, sort the hg38 bed alignment file by read name (column 4), type the command you used below - 2 pt
 ## Tip: Look at the sort command!
-sort -k 4 -n align38SE.bed | head -3
-
+sort -k 4 -n align38SE.bed | head -3 # similarly, sort -k4 -o align38SE.bed align38SE.bed
+ 
 ```
 
 
@@ -139,11 +139,13 @@ Before you get started, you discover that a labmate of yours was comparing the n
 ## read_id  chr_hg38  start_hg38  end_hg38  strand_hg38 chr_hg19  start_hg19  end_hg19  strand_hg19 
 
 #?# Type the command you used to merge the files below - 2pt 
-
+join -j4 -o 1.4,1.1,1.2,1.3,1.6,2.1,2.2,2.3,2.6 align38SE.bed output19SE.bed > merged.bed
 #?# Use the head command to view the first 3 rows of your merged file, copy the output below: - 2pt 
-# 
-# 
-# 
+# SRR12506919.1 chr16 1379150 1379301 + chr16 1379150 1379301 +
+# SRR12506919.10 chr1 109467028 109467179 + chr1 109467028 109467179 +
+# SRR12506919.100 chr19 3556952 3557103 + chr19 3556952 3557103 +
+ 
+ 
 
 
 ## Copy the merged bed file to your local computer for analysis
@@ -167,6 +169,7 @@ Now that you have the files in the right order, you move your files to your loca
 # type.a=c("hg38", "redo"): you should specify a string, that states what is condition A. Defaults are "hg38" and "redo"
 # type.b=c("hg19", "noDet"): you should specify a string, that states what is condition B. Defaults are "hg19" and "noDet"
 
+
 reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "redo"), type.b=c("hg19", "noDet")){
   
   ## Create canonical chromosomes array to filter out contigs and scaffolds for simplicity
@@ -175,10 +178,11 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   ## For column 1
   chr_subset <- merged_bed[,c(cols2compare[1])]
   table_chrs1 <- table(chr_subset)
-
   ## For column 2
   chr_subset <- merged_bed[,c(cols2compare[2])]
   table_chrs2 <- table(chr_subset)
+  print(((canonical_chromosomes)))
+  print((names(table_chrs2)))
   
   
   compare.df <- data.frame(column1=table_chrs1[names(table_chrs1) %in% canonical_chromosomes],
@@ -192,7 +196,7 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   return(compare.df)
   
 }
-
+reads.per.chr(bed, c(2,6), c("hg38","redo"), c("hg19","noDet")) # stuff is not working
 ```
 
 
