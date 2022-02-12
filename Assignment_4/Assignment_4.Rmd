@@ -204,6 +204,7 @@ reads.per.chr(bed, c(2,6), c("hg38","redo"), c("hg19","noDet")) # stuff is not w
 ```{r, eval=TRUE}
 
 #?# Copy the files from the server to your local computer - 1pt
+# scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/ass4/merged.bed .
 
 #?# Load your merged bed file into R suing the *read.csv* function and save it into a data.frame
 #?# Type the command you used below  - 1pt
