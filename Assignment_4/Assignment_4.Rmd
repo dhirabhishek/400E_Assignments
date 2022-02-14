@@ -198,8 +198,6 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   return(compare.df)
   
 }
-stuff <- reads.per.chr(bed2, c(2,6), c("original"), c("redo")) # stuff is not working
-print((stuff))
 ```
 
 
@@ -211,20 +209,24 @@ print((stuff))
 
 #?# Load your merged bed file into R suing the *read.csv* function and save it into a data.frame
 #?# Type the command you used below  - 1pt
+bed <- read.csv("merged.bed", sep = " ", header = FALSE)
 
 ## Change the column names of your merged bed data.frame to: 
 # read_id  chr_hg38  start_hg38  end_hg38  strand_hg38 chr_hg19  start_hg19  end_hg19  strand_hg19 
 #?# Type the command you used below:
-
+colnames(bed)<-c("read_id", "chr_hg38",  "start_hg38",  "end_hg38",  "strand_hg38", "chr_hg19",  "start_hg19",  "end_hg19",  "strand_hg19")
 
 ## Load the reshape2 library, install it if you don't already have it! 
 ## Tip: Use the "packages" tab on the left bottom screen 
 library(reshape2)
 
 #?# Run the reads.per.chr on your genome builds merged bed (previously loaded), specify all the parameters following the instructions of the function, type the command used below: - 1.5 pt 
+rpc1 <- reads.per.chr(bed, c(2,6), c("hg38"), c("hg19"))
 
 #?# How many reads were mapped to two different chromosomes? What percent of reads is this? Type the code and the answers for each below. 2 pt
-
+bed$diff<- ifelse(bed$chr_hg38 == bed$chr_hg19, 0, 1)
+sum(bed$diff)
+# 29413 reads, or 4.865 % of reads
 
 ## Using the output data.frame you got from running the reads.per.chr function on your merged bed, create a barplot that: 
 ## Uses the Chr column for the x-axis
@@ -233,12 +235,12 @@ library(reshape2)
 ## Each build should have their own bar (next to each other), they shouldn't be stacked!!
 #?# Type the command you used below: - 1.5 pt
 library(ggplot2)
-
+ggplot(rpc1, aes(x = Chr, fill = variable, y = value)) +  geom_bar(position = position_dodge(), stat = 'identity')
 
 ```
 
 Which chromosome has the biggest difference between reads? Which genome build had more reads for this chromosome? Answer below - 1 pt
-
+Chr21. The hg38 genome build had more reads for this chromosome. 
 
 
 ### d. Reads position in the genome builds
@@ -251,7 +253,10 @@ Which chromosome has the biggest difference between reads? Which genome build ha
 ## Plots each chromosome in its own subplot (panel) (e.g. see facet_wrap())
 ## Plots only cases where both reads mapped to the same chromosome
 #?# Type the command you used below: - 3 pt
-
+sameMapped <- bed[bed$diff == 0, ]
+ggplot(data = sameMapped, aes(x=start_hg38, y=start_hg19)) +
+  geom_point(color="steelblue") + 
+  facet_wrap(~ chr_hg38)
 
 ```
 
