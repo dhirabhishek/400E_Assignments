@@ -183,20 +183,23 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   table_chrs2 <- table(chr_subset)
   print((length(canonical_chromosomes)))
   print(length(names(table_chrs2)))
+  print(length(names(table_chrs2) %in% canonical_chromosomes))
   
   
   compare.df <- data.frame(column1=table_chrs1[names(table_chrs1) %in% canonical_chromosomes],
-                           column2=table_chrs2[names(table_chrs2) %in% canonical_chromosomes])
-  
+                          column2=table_chrs2[names(table_chrs2) %in% canonical_chromosomes])
+  print("stuff")
   compare.df <- compare.df[,c(1,2,4)]
+  print("stuff") 
   colnames(compare.df) <- c("Chr",paste0(type.a, "_reads"), paste0(type.b, "_reads"))
-  
+ 
   compare.df <- melt(compare.df)
   
   return(compare.df)
   
 }
-reads.per.chr(bed2, c(2,6), c("hg38","redo"), c("hg19","noDet")) # stuff is not working
+stuff <- reads.per.chr(bed2, c(2,6), c("original"), c("redo")) # stuff is not working
+print((stuff))
 ```
 
 
@@ -229,7 +232,7 @@ library(reshape2)
 ## Uses the variable (conditions, also known as different genome builds in this case) column to "fill in" the color 
 ## Each build should have their own bar (next to each other), they shouldn't be stacked!!
 #?# Type the command you used below: - 1.5 pt
-
+library(ggplot2)
 
 
 ```
@@ -307,7 +310,7 @@ colnames(bed2)<-c("read_id", "chr_ori",  "start_ori",  "end_ori",  "strand_ori",
 
 
 #?# Run the reads.per.chr on your genome builds merged bed (previously loaded), specify all the parameters following the instructions of the function, type the command used below: - 1.5 pt 
-
+rpc <- reads.per.chr(bed2, c(2,6), c("original"), c("redo"))
 #?# How many reads were mapped to two different chromosomes? What percent of reads is this? Type the code and the answers for each below. 2 pt
 
 
@@ -320,11 +323,11 @@ colnames(bed2)<-c("read_id", "chr_ori",  "start_ori",  "end_ori",  "strand_ori",
 
 #?# Type the command you used below: - 1.5 pt
 
-
+ggplot(rpc, aes(x = Chr, fill = variable, y = value)) +  geom_bar(position = position_dodge(), stat = 'identity')
 
 #?# Do you see differences among the number of reads per chromosome between the two runs? Answer yes or no - 0.5 pt
 
-
+#No
 ```
 
 You are intrigued by the results of your graph and decide to go deeper into the alignment to get a better idea of where the reads mapped within the genome. 
