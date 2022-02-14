@@ -181,23 +181,23 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   ## For column 2
   chr_subset <- merged_bed[,c(cols2compare[2])]
   table_chrs2 <- table(chr_subset)
-  print((length(canonical_chromosomes)))
-  print(length(names(table_chrs2)))
-  print(length(names(table_chrs2) %in% canonical_chromosomes))
   
-  
+  # extract only rows with the same canonical chromosome namee(e.g. chr1, chr2) for both of the reads 
   compare.df <- data.frame(column1=table_chrs1[names(table_chrs1) %in% canonical_chromosomes],
                           column2=table_chrs2[names(table_chrs2) %in% canonical_chromosomes])
-  print("stuff")
+  
+  # remove column 3 since it should be identical to column 1 now
   compare.df <- compare.df[,c(1,2,4)]
-  print("stuff") 
+  # rename column names
   colnames(compare.df) <- c("Chr",paste0(type.a, "_reads"), paste0(type.b, "_reads"))
- 
+  # organize data
   compare.df <- melt(compare.df)
   
   return(compare.df)
   
 }
+
+
 ```
 
 
@@ -254,6 +254,12 @@ Chr21. The hg38 genome build had more reads for this chromosome.
 ## Plots only cases where both reads mapped to the same chromosome
 #?# Type the command you used below: - 3 pt
 sameMapped <- bed[bed$diff == 0, ]
+canonical_chromosomes <- paste0("chr", 1:22)
+  
+# extract only rows with the canonical chromosome name
+sameMapped <- sameMapped[sameMapped$chr_hg38 %in% canonical_chromosomes, ]
+
+
 ggplot(data = sameMapped, aes(x=start_hg38, y=start_hg19)) +
   geom_point(color="steelblue") + 
   facet_wrap(~ chr_hg38)
@@ -317,8 +323,9 @@ colnames(bed2)<-c("read_id", "chr_ori",  "start_ori",  "end_ori",  "strand_ori",
 #?# Run the reads.per.chr on your genome builds merged bed (previously loaded), specify all the parameters following the instructions of the function, type the command used below: - 1.5 pt 
 rpc <- reads.per.chr(bed2, c(2,6), c("original"), c("redo"))
 #?# How many reads were mapped to two different chromosomes? What percent of reads is this? Type the code and the answers for each below. 2 pt
-
-
+bed2$diff<- ifelse(bed2$chr_ori == bed2$chr_redo, 0, 1)
+sum(bed2$diff)
+# 0 reads were mapped to two different chromosomes, 0%
 
 ## Using the output data.frame you got from running the reads.per.chr function on your merged bed, do a barplot that: 
 ## Uses the Chr column for the x-axis
@@ -341,15 +348,19 @@ You are intrigued by the results of your graph and decide to go deeper into the 
 
 ## Subtract the start position of the original bed from the start position of the redo for all the reads
 #?# Type the command used below: - 0.5 pt
+bed2$startPosDiff <- bed2$start_redo - bed2$start_ori
 
 ## Use the *table* command to tabulate the results from the previous question. Ex. table(a-b)
 #?# Type the command you used below: - 0.5 pt
+table(bed2$startPosDiff)
 
 #?# What do you see? How many have a non zero difference in position start? - 0.5 pt
+# None have a non-zero difference. 
 
 #?# Describe how would you expect a scatterplot comparing the start ends in both runs would look like - 0.5 pt
 ## x-axis: original run
 ## y-axis: re-run 
+# scatterplot would be completely linear with a line formed at y = x
 
 ```
 
