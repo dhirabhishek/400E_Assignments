@@ -159,7 +159,7 @@ Now that you have the files in the right order, you move your files to your loca
 ```{r, eval=TRUE}
 
 #?# Go through the function line by line using your merged bed file and your chosen parameters, as if it weren't a function (e.g. set "merged_bed" to the data.frame containing your data, and run each line of the function (you will also need to set the parameters)). Explain in a concise way how each line is changing the data. Use functions like head and tail to visualize the data as it's changing. - 4 pt
-
+#TODO
 ## reads.per.chr:
 # This function takes a merged bed file of two conditions A and B and gives a data.frame of 3 columns: Chr, variable (condition), value (how many reads per chromosome are when using that condition)
 
@@ -222,7 +222,7 @@ library(reshape2)
 
 #?# Run the reads.per.chr on your genome builds merged bed (previously loaded), specify all the parameters following the instructions of the function, type the command used below: - 1.5 pt 
 rpc1 <- reads.per.chr(bed, c(2,6), c("hg38"), c("hg19"))
-
+print(head(rpc1))
 #?# How many reads were mapped to two different chromosomes? What percent of reads is this? Type the code and the answers for each below. 2 pt
 bed$diff<- ifelse(bed$chr_hg38 == bed$chr_hg19, 0, 1)
 sum(bed$diff)
@@ -365,21 +365,21 @@ You are confused by your friend's results, you don't seem to have the same probl
 
 #?# Re-run the SE alignment that you performed on 1a against the hg38 genome build, change the output name and add this parameter:* --non-deterministic --seed 3 * - 1 pt
 
-
+bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -U /projects/bmeg/A4/SRR12506919_subset.fastq.gz -S another_align38SE.sam --non-deterministic --seed 3
 
 ## Change both sam outputs to bam. Remember to remove the sam files right after it's done!
 #?# Type the commands you used to convert the file below  - 0.5 pt
- 
+samtools view -S -b -h another_align38SE.sam > another_align38SE.bam 
 
 #?# Change the bam file to bed, using the betdools bedtobam function, type the command you used for the file below  - 0.5 pt
-
+bamToBed -i another_align38SE.bam > another_align38SE.bed
 
 #?# Sort the files by read name (same as you did on part 1, using column 4), type the command you used below - 1 pt
-
+sort -k4 -o sorted_another_align38SE.bed another_align38SE.bed
 #?# Merge the "non deterministic" bed file and the "original" hg38 alignment bed (part 1c) using the join command, as in part 1c, this time follow this format: - 1 pt
 ## read_id  chr_ori  start_ori  end_ori  strand_ori chr_nonDet  start_nonDet  end_nonDet  strand_nonDet 
 ## NOTE: Remember to save the output!
-
+join -j4 -o 1.4,1.1,1.2,1.3,1.6,2.1,2.2,2.3,2.6 align38SE.bed sorted_another_align38SE.bed > another_merged.bed
 
 ## Copy the merged bed file to your local computer for analysis
 
@@ -392,11 +392,11 @@ You are confused by your friend's results, you don't seem to have the same probl
 
 #?# Load your merged bed file onto R using the *read.csv* function and save it into a data.frame
 #?# Type the command you used below  - 1 pt
-
+bed3 <- read.csv("another_merged.bed", sep = " ", header = FALSE)
 ## Change the column names of your merged bed data.frame to: 
 ## read_id  chr_ori  start_ori  end_ori  strand_ori chr_nonDet  start_nonDet  end_nonDet  strand_nonDet 
 #?# Type the command you used below:
-
+colnames(bed2)<-c("read_id",  "chr_ori",  "start_ori",  "end_ori",  "strand_ori", "chr_nonDet",  "start_nonDet",  "end_nonDet",  "strand_nonDet")
 #?# How many reads were mapped to two different chromosomes? What percent of reads is this? Type the code and the answers for each below. 2 pt
 
 
