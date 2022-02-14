@@ -168,7 +168,7 @@ Now that you have the files in the right order, you move your files to your loca
 # cols2compare=c(2,6): default is column 2 versus 6, which if you followed the format specified when you merged the files, they should correspond to the chromosome column of each read for the two conditions (e.g., hg38 and hg19)
 # type.a=c("hg38", "redo"): you should specify a string, that states what is condition A. Defaults are "hg38" and "redo"
 # type.b=c("hg19", "noDet"): you should specify a string, that states what is condition B. Defaults are "hg19" and "noDet"
-
+#bed <- as.data.frame(read.table("merged.bed",header = FALSE, sep=" ",stringsAsFactors=FALSE, quote=""))
 
 reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "redo"), type.b=c("hg19", "noDet")){
   
@@ -181,8 +181,8 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   ## For column 2
   chr_subset <- merged_bed[,c(cols2compare[2])]
   table_chrs2 <- table(chr_subset)
-  print(((canonical_chromosomes)))
-  print((names(table_chrs2)))
+  print((length(canonical_chromosomes)))
+  print(length(names(table_chrs2)))
   
   
   compare.df <- data.frame(column1=table_chrs1[names(table_chrs1) %in% canonical_chromosomes],
@@ -196,7 +196,7 @@ reads.per.chr <- function(merged_bed, cols2compare=c(2,6), type.a=c("hg38", "red
   return(compare.df)
   
 }
-reads.per.chr(bed, c(2,6), c("hg38","redo"), c("hg19","noDet")) # stuff is not working
+reads.per.chr(bed2, c(2,6), c("hg38","redo"), c("hg19","noDet")) # stuff is not working
 ```
 
 
@@ -263,25 +263,25 @@ You are glad that you have answered most of your burning questions about read ma
 ```{bash, eval=FALSE}
 
 #?# Re-run the SE alignment that you performed on 1a against the hg38 genome build, use exactly the same parameters, just change the output name  - 0.5 pt
-
+bowtie2 -x /projects/bmeg/indexes/hg38/hg38_bowtie2_index -U /projects/bmeg/A4/SRR12506919_subset.fastq.gz -S again_align38SE.sam
 
 
 ## Change both sam output to bam. Remember to remove the sam files right after it's done!
 #?# Type the commands you used to convert the file below  - 0.5 pt
-
+samtools view -S -b -h again_align38SE.sam > again_align38SE.bam
 
 #?# Change the bam file to bed, using the betdools bedtobam function, type the command you used for the file below - 0.5 pt
-
+bamToBed -i again_align38SE.bam > again_align38SE.bed
 
 #?# Sort the file by read name (same as you did on part 1, using column 4), type the command you used below - 1 pt
-
+sort -k4 -o sorted_again_align38SE.bed again_align38SE.bed
 
 ## Because what you really want to see is if and what changed between these bowtie2 runs compared to your first run on Part 1b, you decide to merge each new run file with the original:
 
 #?# Merge the "redo" bed file and the "original" hg38 alignment bed (from part 1c) using the join command, as in part 1c, this time follow this format: 1 pt
 ## read_id chr_ori  start_ori  end_ori  strand_ori chr_redo  start_redo  end_redo  strand_redo
 ## NOTE: Remember to save the output!
-
+join -j4 -o 1.4,1.1,1.2,1.3,1.6,2.1,2.2,2.3,2.6 align38SE.bed sorted_again_align38SE.bed > again_merged.bed
 
 ## Copy the merged bed file to your local computer for analysis
 
@@ -299,10 +299,11 @@ Your last analysis on the differences between genome build turn out so well, tha
 
 #?# Load your merged bed file into R using the *read.csv* function and save it into a data.frame
 #?# Type the command you used below  - 1pt
-
+bed2 <- read.csv("again_merged.bed", sep = " ", header = FALSE)
 ## Change the column names of your merged bed data.frame to: 
 ## read_id chr_ori  start_ori  end_ori  strand_ori chr_redo  start_redo  end_redo  strand_redo
 #?# Type the command you used below:
+colnames(bed2)<-c("read_id", "chr_ori",  "start_ori",  "end_ori",  "strand_ori", "chr_redo",  "start_redo",  "end_redo",  "strand_redo")
 
 
 #?# Run the reads.per.chr on your genome builds merged bed (previously loaded), specify all the parameters following the instructions of the function, type the command used below: - 1.5 pt 
