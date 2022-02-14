@@ -393,8 +393,8 @@ You are confused by your friend's results, you don't seem to have the same probl
 
 
 ## Using the start position of the reads on both alignment runs do a scatterplot in ggplot that: 
-## Has the start in the hg38 genome build in the x-axis
-## Has the start in the hg19 genome build in the y-axis
+## Has the start in the hg38_original in the x-axis
+## Has the start in the hg38_nonDet build in the y-axis
 ## Plots each chromosome in its own subplot (panel) (e.g. see facet_wrap())
 ## Plots only cases where both reads mapped to the same chromosome
 #?# Type the command you used below: - 2 pt
