@@ -407,9 +407,10 @@ bed3 <- read.csv("another_merged.bed", sep = " ", header = FALSE)
 ## Change the column names of your merged bed data.frame to: 
 ## read_id  chr_ori  start_ori  end_ori  strand_ori chr_nonDet  start_nonDet  end_nonDet  strand_nonDet 
 #?# Type the command you used below:
-colnames(bed2)<-c("read_id",  "chr_ori",  "start_ori",  "end_ori",  "strand_ori", "chr_nonDet",  "start_nonDet",  "end_nonDet",  "strand_nonDet")
+colnames(bed3)<-c("read_id",  "chr_ori",  "start_ori",  "end_ori",  "strand_ori", "chr_nonDet",  "start_nonDet",  "end_nonDet",  "strand_nonDet")
 #?# How many reads were mapped to two different chromosomes? What percent of reads is this? Type the code and the answers for each below. 2 pt
-
+bed3$diff<- ifelse(bed3$chr_ori == bed3$chr_nonDet, 0, 1)
+sum(bed3$diff)
 
 ## Using the start position of the reads on both alignment runs do a scatterplot in ggplot that: 
 ## Has the start in the hg38_original in the x-axis
@@ -417,13 +418,30 @@ colnames(bed2)<-c("read_id",  "chr_ori",  "start_ori",  "end_ori",  "strand_ori"
 ## Plots each chromosome in its own subplot (panel) (e.g. see facet_wrap())
 ## Plots only cases where both reads mapped to the same chromosome
 #?# Type the command you used below: - 2 pt
+filter_bed3 <- bed3[c("chr_ori", "start_ori", "chr_nonDet","start_nonDet")]
+canonical_chromosomes <- paste0("chr", 1:22)
+filter_bed3 <- filter_bed3[filter_bed3$chr_ori %in% canonical_chromosomes, ]
+filter_bed3 <- filter_bed3[filter_bed3$chr_nonDet %in% canonical_chromosomes,]
+filter(filter_bed3, filter_bed3$chr_nonDet %in% canonical_chromosomes)
+filter(filter_bed3, filter_bed3$chr_ori %in% canonical_chromosomes)
+filter_bed3 = filter_bed3[filter_bed3$chr_ori == filter_bed3$chr_nonDet,]
+ggplot(data = filter_bed3, aes(y = start_nonDet,x = start_ori)) + facet_wrap(~ chr_nonDet + chr_ori) + geom_point()
+
+sameMapped <- bed3[bed3$diff == 0, ]
+canonical_chromosomes <- paste0("chr", 1:22)
+  
+# extract only rows with the canonical chromosome name
+sameMapped <- sameMapped[sameMapped$chr_hg38 %in% canonical_chromosomes, ]
 
 
-
-#?# Explain why this changes when you add the --non-deterministic --seed 3 flags. What is are these flags doing? Why did you get the result you saw in 2b?- 2 pt
+ggplot(data = sameMapped, aes(x=start_hg38, y=start_hg19)) +
+  geom_point(color="steelblue") + 
+  facet_wrap(~ chr_hg38)
+ #?# Explain why this changes when you add the --non-deterministic --seed 3 flags. What is are these flags doing? Why did you get the result you saw in 2b?- 2 pt
 ## Tip: Look at the bowtie2 documentation!
-
-
+#  Bowtie2 has different ways of generating seeds for its pseudo-random generator. When we use the non-deterministic flag, 
+# it is using the current time for each read. Also using the flag `seed` we are setting a specific value of seed for the 
+# pseudo-random generator.
 
 #?# How do the number of off-diagonal reads and reads mapping to different chromosomes compare between where we mapped to two different genome versions (and then lifted over), versus the use of non-deterministic alignment? What fraction of reads that you found aligned to different chromsomes when using hg19 vs hg38 result from the differences between these two versions? - 3 pts
 
@@ -443,6 +461,7 @@ Successful knitting to github_document - 2 pts
 
 Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
 
-Authors: Name1 (studentID1) and Name2 (studentID2)
+Authors: Alice Zhang (52721552) and Abhishek Dhir (87603866)
 
-Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
+Contributions: Alice and Abhishek worked together asynchronously on the assignment together and then pushed the combined changes in the end, after a synchronous working session.
+
