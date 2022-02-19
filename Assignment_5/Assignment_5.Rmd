@@ -42,7 +42,8 @@ We will be using a couple of new tools this time. Before we move on to the pract
 ```{bash, eval=FALSE}
 
 #?# Add macs2 and deeptools to your environment created on A1 - 1 pt
-
+conda install -c bioconda macs2
+conda install -c bioconda deeptools
 ## Install IGV to your local computer after downloading it from: https://software.broadinstitute.org/software/igv/home
 
 ```
@@ -60,16 +61,16 @@ ChIP-seq experiments require a control against which to compare the ChIP signnal
 
 #?# Type the commands you use for converting each of the 4 bam files to bigwig files - 2 pts
 ## input_chr3_subset.bam
-
+bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o input_chr3.bw
 
 ## H3K4me3_chr3_subset.bam
-
+bamCoverage -b /projects/bmeg/A5/directory/H3K4me3_chr3_subset.bam -o H3K4me3_chr3.bw
 
 ## H3K27me3_chr3_subset.bam
- 
+bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o H3K27me3_chr3.bw
 
 ## H3K27ac_chr3_subset.bam
- 
+bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o H3K27ac_chr3.bw 
 
 
 ### Follow this steps: 
