@@ -1,8 +1,5 @@
 ---
-title: "Genome Informatics A6"
-author: ""
-date: "24/02/2021"
-#output: html_document
+title: "Assignment 6: ATAC-seq"
 output:
   github_document:
     toc: true
@@ -13,12 +10,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
-#install any of these you might not have already
-library(ggplot2)
-library(edgeR)
-library(reshape)
-```
+# Assignment overview
+
 *Today we will be looking at a differential ATAC-seq dataset between cells treated with an anti BAF protac and control (untreated) cells. The cell type is HAP1, a cancer cell line with a near-haploid genome. We will use this dataset to explore differential analysis. *
 
 *The GEO entry is located here, where you can read more about the experiments: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE148175 *
@@ -28,15 +21,36 @@ library(reshape)
 *"Acute BAF perturbation causes immediate changes in chromatin accessibility"*
 
 
+
+# Part 0: Getting ready 
+
 ```{r}
-#download the data
-atacSeqData = read.table(textConnection(readLines(gzcon(url("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148175/suppl/GSE148175_count_matrix_raw_atac_BRM014_ACBI1.csv.gz")))), 
-                      sep=",", stringsAsFactors = FALSE, header = TRUE)
+#install any of these you might not have already
+
+library(ggplot2)
+library(edgeR)
+library(reshape)
+library(GenomicRanges)
+library(csaw)
+library(Biostrings)
+
+
 ```
 
 
 ```{r}
+
+#download the data
+atacSeqData = read.table(textConnection(readLines(gzcon(url("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE148nnn/GSE148175/suppl/GSE148175_count_matrix_raw_atac_BRM014_ACBI1.csv.gz")))), 
+                      sep=",", stringsAsFactors = FALSE, header = TRUE)
+
+```
+
+
+```{r}
+
 #create a sample metadata data.frame
+
 samples = data.frame(ID = names(atacSeqData)[2:ncol(atacSeqData)])
 samples$replicate = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\1",samples$ID)
 samples$timeName = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\2",samples$ID)
@@ -44,7 +58,9 @@ samples$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",samples$ID)
 samples$treatment[samples$treatment=="N"]="BRM014"
 samples$time= as.numeric(gsub("[a-z]*","",samples$timeName))
 samples$time[grepl("min",samples$timeName)]=samples$time[grepl("min",samples$timeName)]/60
+
 ```
+
 
 
 # Part 1: understanding the experiment
@@ -203,7 +219,7 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 ### `#?#` *Perform the same differential peak analysis using loess regularization. - 1 pt*
 ```{r}
 #Note: the Bioconductor package csaw implements loess regularization in a way that is compatible with edgeR
-library(csaw)
+## Tip: use the csaw library to implement the loess regularization
 
 
 ```
@@ -226,7 +242,7 @@ library(csaw)
 ### `#?#` *Convert the region IDs to a GRanges object - 3 pt*
 ```{r}
 #note that the names of your peaks are of the format <chr>:<startPos>-<endPos>
-library(GenomicRanges)
+## Tip: lookinto the GenomicRanges documentation 
 
 
 
@@ -236,7 +252,7 @@ library(GenomicRanges)
 ### `#?#` *Extract the genomic DNA sequences for each peak using hg38 - 3 pt*
 *See for relevant documentation: https://bioconductor.org/packages/release/workflows/vignettes/sequencing/inst/doc/sequencing.html *
 ```{r}
-library(Biostrings)
+## Tip: Use the Biostring library 
 library(BSgenome.Hsapiens.UCSC.hg38)
 
 ```
@@ -326,4 +342,16 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 *Knit your assignment as a github_document and submit the resulting .md and this .Rmd to your github, and complete the assignment submission on Canvas. Make sure to include the graphs with your submission. *
  
+
+
+
+# Authors and contributions
+
+Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
+
+Authors: Name1 (studentID1) and Name2 (studentID2)
+
+Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
+
+
 
