@@ -94,7 +94,6 @@ bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o H3K27ac_chr3.bw
 # A blacklisted region is where the genome assembly results in erroneous signal. These signals need to be filtered out befor
 #ChIP-seq to ensure that there are not biases in the results.
 
-#TODO insert files below please
 ```
 
 **Add screenshot of your IGV session here: **. (Use Rmarkdown syntax)
@@ -136,7 +135,7 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 
 
 #?# Explain what you are looking at (Axes, colours, curves). Where are the marks located? What are the differences between the clusters? - 3 pts
-
+# The x axis of the heatmap shows the gene distance in base pairs and the y axis shows which cluster each row corresponds to. The colours are shown in the legend on the right, with darker colors representing larger values. The curves show the data points that are being represented by the heatmap, which correspond to scores we calculated earlier. The marks are located in the darkest areas of the heatmap. The first cluster and second cluster have higher scores in general than the third cluster. Within each cluster the values are relatively similar to each other, which makes sense since we used hierarchical clustering. 
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
@@ -151,7 +150,7 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 #plotHeatmap -m reference_notnorm.tab --colorMap Blues --hclust 3 -o heatmap_notnorm.svg
 #?# Include a screenshot of this analysis, below this code block. - 1 pt
 #?# How does this compare to the input-normalized data? Why do you think this is? - 1 pt
-#TODO
+# The normalized data has more area covered in higher relative values (shown by the darker areas). This is because normalizing the data changes it to a common scale so we can better compare the data. So the relative ranges for the normalized data are the same as the non-normalized, but scaled to allow comparisons. 
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
