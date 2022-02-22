@@ -142,6 +142,7 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 
 ![](heatmap.svg)
 
+
 ```{bash, eval=FALSE}
 
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
@@ -230,11 +231,21 @@ For this assignment, we are working with 3 different epigenetic marks: H3K4me3, 
 #?# Write the commands you used to compute the matrices and create the heatmaps below: - 3 pt
 
 
-#?# Add screenshots of the 3 heatmaps you got using the epigenetic marks' peak files as reference files. Add them after this code chunk (using Rmarkdown syntax) in the following order: H3K4me3, H3K27ac, H3K27me3 - 1.5 pt
+#computeMatrix reference-point -S /projects/bmeg/A5/H3K4me3_norm.bw /projects/bmeg/A5/H3K27me3_norm.bw /projects/bmeg/A5/H3K27ac_norm.bw -R H3K27ac_peaks.narrowPeak -o h3k27ac_peaks_refenence.tab -a 1000 -b 1000
+#plotHeatmap -m h3k27ac_peaks_refenence.tab --colorMap Blues --hclust 3 -o heatmap_h3k27ac_norm.svg
 
+#computeMatrix reference-point -S /projects/bmeg/A5/H3K4me3_norm.bw /projects/bmeg/A5/H3K27me3_norm.bw /projects/bmeg/A5/H3K27ac_norm.bw -R H3K27me3_peaks.broadPeak -o h3k27me3_peaks_refenence.tab -a 1000 -b 1000
+#plotHeatmap -m h3k27me3_peaks_refenence.tab --colorMap Blues --hclust 3 -o heatmap_h3k27me3_norm.svg
+
+#computeMatrix reference-point -S /projects/bmeg/A5/H3K4me3_norm.bw /projects/bmeg/A5/H3K27me3_norm.bw /projects/bmeg/A5/H3K27ac_norm.bw -R H3K4me3_peaks.narrowPeak -o h3k4me3_peaks_refenence.tab -a 1000 -b 1000
+#plotHeatmap -m  h3k4me3_peaks_refenence.tab --colorMap Blues --hclust 3 -o heatmap_h3k4me3_norm.svg
+#?# Add screenshots of the 3 heatmaps you got using the epigenetic marks' peak files as reference files. Add them after this code chunk (using Rmarkdown syntax) in the following order: H3K4me3, H3K27ac, H3K27me3 - 1.5 pt
+#Screenshots are added in order as listed above:
 
 ```
-
+![](heatmap_h3k4me3_norm.svg)
+![](heatmap_h3k27ac_norm.svg)
+![](heatmap_h3k27me3_norm.svg)
 
 
 
