@@ -98,7 +98,7 @@ bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o H3K27ac_chr3.bw
 ```
 
 **Add screenshot of your IGV session here: **. (Use Rmarkdown syntax)
-
+![](igv_snapshot_autoscale.png)
 
 
 ## 2. Narrow vs Broad peaks 
@@ -194,10 +194,10 @@ Macs2 calls the peaks by analyzing the enrichments of sequences in the genome co
 ## 4. Go to this position: * chr3:44,608,952-44,670,849 *
 
 #?# Compare the input and H3K4me3 signal trakcs (a and b), are there regions that you consider to have an enriched signal in the H3K4me3 track compared to the input? If yes, how many?- 0.5 pt 
-
+# Yes, there are two sections.
 
 #?# Why do you consider those regions to have an enrichment? Would you need to confirm that the enrichment is statistically significant? If so, what do you think would be a way to test for the significance (you can mention the tools used on this assignment or explain conceptually what would you do to confirm an enrichment)? - 1 pt
-
+# These regions have an enrichment because they have peaks in the H3K4me3 track. The other regions are all flat. 
 
 ## 5. Load into the same session the following files:
 ### c. H3K4me3 normalized using the input bigWig file that was pre-computed and you used on section 2
@@ -207,8 +207,10 @@ Macs2 calls the peaks by analyzing the enrichments of sequences in the genome co
 ## 6. Go to the same position as in step 4
 
 #?# Does the region/s you thought had an enrichment show differences between the input and the H3K4me3 mark in the bamCompare (file c)? - 0.5 pt
+# Yes, it does.
 
 #?# Are these visually enriched regions you selected, found in file d (narrowPeak)? What does that mean? - 1 pt
+# Yes, it does. It means that there are peaks that represent signal enrichment in the selected regions. This means that the peaks identified in the H3K4me3 track were correct. 
 
 #?# Add a screenshot of your IGV session right after this chunk, using Rmarkdown syntax - 1pt
 
@@ -227,7 +229,6 @@ For this assignment, we are working with 3 different epigenetic marks: H3K4me3, 
 
 ### Create 3 heatmaps following the specifications you used on part 2 (one for the peaks called for each epigenetic mark, both containing data from all three tracks). Use the peak files of each of the epigenetic marks as reference files. Use ONLY the non-input normalized files: H3K27ac_norm.bw H3K27me3_norm.bw H3K4me3_norm.bw
 #?# Write the commands you used to compute the matrices and create the heatmaps below: - 3 pt
-
 
 
 #?# Add screenshots of the 3 heatmaps you got using the epigenetic marks' peak files as reference files. Add them after this code chunk (using Rmarkdown syntax) in the following order: H3K4me3, H3K27ac, H3K27me3 - 1.5 pt
