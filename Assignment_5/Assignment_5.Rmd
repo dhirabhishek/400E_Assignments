@@ -252,13 +252,13 @@ For this assignment, we are working with 3 different epigenetic marks: H3K4me3, 
 ```{}
 
 #?# Do you see an overlap between the peaks of different epigenetic marks? Which epigenetic marks? - 1 pt
-
+# Yes, there is some overlap between the peaks of H3K27ac and H3K27me3. This is because both epigenetic marks are associated with higher transcription activation and and enhancer activity. 
 
 #?# Why do you think these epigenetic marks overlap? - 1 pt
-
+# It is common for parts of epigenetic marks to overlap. It can be useful to compress information into genetic sequences, and is also a way to regulate gene expression since polypeptides with similar functions can be coupled together. 
 
 #?# Explain the pattern you see for the peaks of H3K27me3, do they look similar or different to the other two marks? Why do you think this happens? - 1pt
-
+# The graph is fairly flat until TSS, where a hump forms. All three clusters follow this pattern. This looks different to the other marks (H3K27 is more flat, and H3K4me3 is somewhat flat with larger humps). This could be because H3K27me3 is involved in transcriptional silencing. 
 
 #?# Why do you think the borders of the elements have such clearly-defined borders with respect to the ChIP signal? -1 pt
 
