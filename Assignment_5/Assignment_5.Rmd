@@ -61,16 +61,16 @@ ChIP-seq experiments require a control against which to compare the ChIP signnal
 
 #?# Type the commands you use for converting each of the 4 bam files to bigwig files - 2 pts
 ## input_chr3_subset.bam
-bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o input_chr3.bw
+bamCoverage -b /projects/bmeg/A5/input_chr3_subset.bam -o input_chr3.bw
 
 ## H3K4me3_chr3_subset.bam
-bamCoverage -b /projects/bmeg/A5/directory/H3K4me3_chr3_subset.bam -o H3K4me3_chr3.bw
+bamCoverage -b /projects/bmeg/A5/H3K4me3_chr3_subset.bam -o H3K4me3_chr3.bw
 
 ## H3K27me3_chr3_subset.bam
-bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o H3K27me3_chr3.bw
+bamCoverage -b /projects/bmeg/A5/H3K27me3_chr3_subset.bam -o H3K27me3_chr3.bw
 
 ## H3K27ac_chr3_subset.bam
-bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o H3K27ac_chr3.bw 
+bamCoverage -b /projects/bmeg/A5/H3K27ac_chr3_subset.bam -o H3K27ac_chr3.bw 
 
 
 ### Follow this steps: 
@@ -84,15 +84,17 @@ bamCoverage -b /projects/bmeg/A5/directory/input_chr3_subset.bam -o H3K27ac_chr3
 #?# Include a screenshot of your IGV session right after this code chunk (using the Rmarkdown syntax)  - 2 pt
 
 #?# Explore this region by zooming in and out and navigating around. What do you see? Is there something similar across all the different files that stands out on this region? Is there anything peculiar about the DNA sequence at this locus?- 3 pt
-
+# All the files look the same to our eyes on IGV. It looks like they have very similar peaks in this region. But when autoscale is turned on, the peaks look identical to a naked eye, and the shape of it looks like a bell curve.
 ## Tip: sometimes track signal will be truncated to a pre-set maximum. If you right-click the track label (left) and select "autoscale", it will automatically adust the scales of the track to the range of your data. Try playing around with the track settings to see their effect.
 
 ## 4. This file (/projects/bmeg/A5/hg38_blacklisted_regions.bed) contains the hg38 blacklisted regions. Load it into IGV along with all the other files. 
 
 ## 5. Look at the following region again (chr3:93,470,124-93,471,058). 
 #?# What can you say now about the similarities between the files at this region? In your own words, explain what a blacklisted region is and if you think this region should be excluded a ChIP-seq analysis. - 1.5 pt
+# A blacklisted region is where the genome assembly results in erroneous signal. These signals need to be filtered out befor
+#ChIP-seq to ensure that there are not biases in the results.
 
-
+#TODO insert files below please
 ```
 
 **Add screenshot of your IGV session here: **. (Use Rmarkdown syntax)
@@ -120,9 +122,7 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 ## - Use all 3 input-normalized bigWig files (H3K4me3, H3K27ac, H3K27me3) as signal tracks
 #?# Write the command you used to run it below: - 1.5 pt
 
-
-
-
+#computeMatrix reference-point -S /projects/bmeg/A5/H3K4me3_norm.bw /projects/bmeg/A5/H3K27me3_norm.bw /projects/bmeg/A5/H3K27ac_norm.bw -R /projects/bmeg/A5/reference_genes.bed -o reference.tab -a 1000 -b 1000
 
 ## Now that the scores matrix has been computed, we can use it to create a heatmap to provide a better visual representation of the reads distrubution across our reference genes (provided in the reference_genes.bed file)
 ## Use the deepTools ** plotHeatmap ** function to create a heatmap following this criteria: 
@@ -132,7 +132,7 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 #?# Type the command you used to run it below: - 1.5
 #?# Add a screenshot of the plot right after this code chunk using Rmarkdown syntaxis - 1 pt 
 
-
+#plotHeatmap -m reference.tab --colorMap Blues --hclust 3 -o heatmap.svg
 
 
 #?# Explain what you are looking at (Axes, colours, curves). Where are the marks located? What are the differences between the clusters? - 3 pts
@@ -141,20 +141,21 @@ While exploring the bigwig files of the epigenetic marks on IGV, you probably no
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
 
-![](iPSC_deeptools.png)
+![](heatmap.svg)
 
 ```{bash, eval=FALSE}
 
 ## Now the above heatmap was made with the ratio of ChIP to input. Repeat the process above, but this time using the raw bigwig files (not input-normalized). 
 #?# Type the commands you used for this below - 1 pt
-
+#computeMatrix reference-point -S H3K4me3_chr3.bw H3K27me3_chr3.bw H3K27ac_chr3.bw -R /projects/bmeg/A5/reference_genes.bed -o reference_notnorm.tab -a 1000 -b 1000
+#plotHeatmap -m reference_notnorm.tab --colorMap Blues --hclust 3 -o heatmap_notnorm.svg
 #?# Include a screenshot of this analysis, below this code block. - 1 pt
 #?# How does this compare to the input-normalized data? Why do you think this is? - 1 pt
-
+#TODO
 ```
 
 **Add screenshot here: ** (Use Rmarkdown syntax)
-
+![](heatmap_notnorm.svg)
 
 ## 3. Peak calling 
 
@@ -170,8 +171,7 @@ Now we want to identify enriched regions of the genome for each of our three his
 ## Each time, use the input as the control 
 ## For H3K27Me3, you should call "broad" peaks because these signals tend to form longer domains and not acute peaks.
 #?# Type the commands you used below: - 1.5 pt
-
-
+# macs2 callpeak -t /projects/bmeg/A5/H3K4me3_chr3_subset.bam -c /projects/bmeg/A5/input_chr3_subset.bam -n H3K4me3 & macs2 callpeak -t /projects/bmeg/A5/H3K27me3_chr3_subset.bam -c /projects/bmeg/A5/input_chr3_subset.bam -n H3K27me3 --broad & macs2 callpeak -t /projects/bmeg/A5/H3K27ac_chr3_subset.bam -c /projects/bmeg/A5/input_chr3_subset.bam -n H3K27ac 
 
 
 ```
