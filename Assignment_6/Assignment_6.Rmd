@@ -70,12 +70,18 @@ samples$time[grepl("min",samples$timeName)]=samples$time[grepl("min",samples$tim
 ### `#?#` *Make the above plot. Each point should represent one of the samples.  - 1 pt*
 ```{r}
 #here, if the point is there, it means such a sample exists, if absent it means that there is no such sample
-
+#ggplot(data = sameMapped, aes(x=start_ori, y=start_nonDet)) +
+  #geom_point(color="steelblue") + 
+  #facet_wrap(~ chr_ori)
+ggplot(data =samples, aes(x=time, y = treatment))+
+  geom_point()+
+  facet_wrap(~replicate)
 ```
 
 *In this study, one of the things they were comparing was BRM014 to DMSO. The drug BRM014 is dissolved in DMSO, so DMSO alone is the appropriate control to gauge the effect of BRM014.*
 
 ### `#?#` *Can we compare BRM014 to DMSO across all time points? Why/why not?  - 1 pt*
+#TODO
 
 # Part 2: QC
 
