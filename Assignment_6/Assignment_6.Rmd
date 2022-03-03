@@ -91,7 +91,7 @@ ggplot(data =samples, aes(x=time, y = treatment))+
 
 meltedSeqData<-melt(atacSeqData)
 meltedSeqData$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",meltedSeqData$variable)
-readCoverage <- aggregate(df$value, list(meltedSeqData$treatment), sum)
+readCoverage <- aggregate(meltedSeqData$value, list(meltedSeqData$treatment), sum)
 colnames(readCoverage) <- c("treatment", "reads")
 ggplot(data =readCoverage, aes(x=treatment, y = reads))+
   geom_point()
@@ -100,13 +100,13 @@ ggplot(data =readCoverage, aes(x=treatment, y = reads))+
 ### `#?#` *Which sample has the most coverage? - 0.5 pt*
 N: BRM014 has the most coverage
 ```{r}
-max(df2$treatment)
+max(meltedSeqData$treatment)
 ```
 
 ### `#?#` *Which sample has the least? - 0.5 pt*
 Control
 ```{r}
-min(df2$treatment)
+min(meltedSeqData$treatment)
 ```
 
 ### `#?#` *What is the % difference between the max and min (relative to the min)? - 0.5 pt*
@@ -162,7 +162,7 @@ It is likely performed when looking at genomics because the unprocessed data is 
 
 ### `#?#` *Some regions have very large CPMs. Inspect the peaks for which CPM>400. What do you notice about them? 3 pt*
 ```{r}
-largeCPM <- df3[cpm(df3$value) > 400, ]
+largeCPM <- downsampledSeqData[cpm(downsampledSeqData$value) > 400, ]
 ```
 They are all from times 6 hours or 24 hours.
 *Normally, we would remove some of these regions before continuing (and would redo the above steps). Since this is an assignment, we will continue with the data as-is.*
@@ -184,17 +184,19 @@ They are all from times 6 hours or 24 hours.
 
 ### `#?#` *Filter your data, retaining only regions where the average counts per sample is greater than 10, and also remove mitochondrial regions - 3 pt*
 ```{r}
-
-
-
+library(tidyverse)
+filteredData <- downsampledSeqData[downsampledSeqData$value > 10,]
+filteredData <- filteredData %>% filter(!str_detect(region, 'chrM'))
 
 ```
 
 ### `#?#` *How many peaks did you have before? How many do you have now? - 1 pt*
 ```{r}
-
+#assuming peak is a number in value, i might be wrong TODO: Alice please check 
+print(sum(downsampledSeqData$value))
+sum(filteredData$value)
 ```
-
+Before we had 26219406 peaks but now we have 22415384 peaks.
 
 # Part 3: Differential ATAC
 
