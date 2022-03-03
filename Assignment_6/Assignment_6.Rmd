@@ -70,9 +70,6 @@ samples$time[grepl("min",samples$timeName)]=samples$time[grepl("min",samples$tim
 ### `#?#` *Make the above plot. Each point should represent one of the samples.  - 1 pt*
 ```{r}
 #here, if the point is there, it means such a sample exists, if absent it means that there is no such sample
-#ggplot(data = sameMapped, aes(x=start_ori, y=start_nonDet)) +
-  #geom_point(color="steelblue") + 
-  #facet_wrap(~ chr_ori)
 ggplot(data =samples, aes(x=time, y = treatment))+
   geom_point()+
   facet_wrap(~replicate)
@@ -81,7 +78,7 @@ ggplot(data =samples, aes(x=time, y = treatment))+
 *In this study, one of the things they were comparing was BRM014 to DMSO. The drug BRM014 is dissolved in DMSO, so DMSO alone is the appropriate control to gauge the effect of BRM014.*
 
 ### `#?#` *Can we compare BRM014 to DMSO across all time points? Why/why not?  - 1 pt*
-#TODO
+###No, some sample points only exist for some time points in BRM014, and not DMSO.
 
 # Part 2: QC
 
@@ -92,31 +89,32 @@ ggplot(data =samples, aes(x=time, y = treatment))+
 ```{r}
 # there are many ways you could do this; one of which is using the melt/cast functions from reshape
 
-df<-melt(atacSeqData)
-df$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",df$variable)
-df2 <- aggregate(df$value, list(df$treatment), sum)
-
-colnames(df2) <- c("treatment", "reads")
-ggplot(data =df2, aes(x=treatment, y = reads))+
+meltedSeqData<-melt(atacSeqData)
+meltedSeqData$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",meltedSeqData$variable)
+readCoverage <- aggregate(df$value, list(meltedSeqData$treatment), sum)
+colnames(readCoverage) <- c("treatment", "reads")
+ggplot(data =readCoverage, aes(x=treatment, y = reads))+
   geom_point()
 ```
 
 ### `#?#` *Which sample has the most coverage? - 0.5 pt*
+N: BRM014 has the most coverage
 ```{r}
-max(df2$reads)
+max(df2$treatment)
 ```
 
 ### `#?#` *Which sample has the least? - 0.5 pt*
+Control
 ```{r}
-min(df2$reads)
+min(df2$treatment)
 ```
 
 ### `#?#` *What is the % difference between the max and min (relative to the min)? - 0.5 pt*
 ```{r}
-differenc <- max(df2$reads) - min(df2$reads)
-perc <- differenc/min(df2$reads) * 100
-perc
+
+(max(readCoverage$reads)-min(readCoverage$reads))/min(readCoverage$reads)*100
 ```
+209.7%
 
 *In cases where samples have vastly different coverage, you can potentially down-sample the higher-coverage samples. Sometimes, throwing out the data in this way can also introduce new problems, so we're going to stick with the data we have.*
 
@@ -124,14 +122,17 @@ perc
 
 ### `#?#` *Create a new data.frame containing only the BI_protac and control samples - 1 pt*
 ```{r}
-df3<-melt(atacSeqData)
-df3$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",df3$variable)
-stuff <- filter(df3, treatment == "BI_protac" | treatment == "control")
+downsampledSeqData<-meltedSeqData[meltedSeqData$treatment == "BI_protac" | meltedSeqData$treatment == "control", ]
 
 ```
 
 ### `#?#` *For this subset, calculate the counts per million reads (CPM) for each sample - 2 pt*
 ```{r}
+library(edgeR)
+protac_reads <- downsampledSeqData[downsampledSeqData$treatment == "BI_protac", ]
+control_reads <- downsampledSeqData[downsampledSeqData$treatment == "control", ]
+CPM_protac <- cpm(protac_reads$value)
+CPM_control <- cpm(control_reads$value)
 
 ```
 
@@ -139,23 +140,31 @@ stuff <- filter(df3, treatment == "BI_protac" | treatment == "control")
 ### `#?#` *Plot the kernel density estimate for CPM (x axis). 1 curve per sample, different colours per curve. - 1 pt*
 
 ```{r}
-
+protac_density <- density(CPM_protac)
+control_density <- density(CPM_control)
+plot(protac_density, type = "l", col = "red")
+lines(control_density,col="blue")
+legend( x = "topright", legend=c("control", "BI_protac"), 
+        col=c("blue", "red"), pch=c("-","-"))
 ```
 
 ### `#?#` *Plot the kernel density estimate for log(CPM+1) (x axis), coloured as before - 1 pt*
 
 ```{r}
-
+plot(density(log(CPM_protac+1)), type = "l", col = "red")
+lines(density(log(CPM_control+1)), col = "blue")
+legend( x = "topright", legend=c("control", "BI_protac"), 
+        col=c("blue", "red"), pch=c("-","-"))
 ```
 
 ### `#?#` *Why do you think log-transforming is usually performed when looking at genomics data? What about adding 1 before log transforming? - 2 pt*
-
+It is likely performed when looking at genomics because the unprocessed data is very skewed (many 0s). 1 is added to avoid taking the log transform of 0, which is common in the data. 
 
 ### `#?#` *Some regions have very large CPMs. Inspect the peaks for which CPM>400. What do you notice about them? 3 pt*
 ```{r}
-
+largeCPM <- df3[cpm(df3$value) > 400, ]
 ```
-
+They are all from times 6 hours or 24 hours.
 *Normally, we would remove some of these regions before continuing (and would redo the above steps). Since this is an assignment, we will continue with the data as-is.*
 
 *Often a good first step is to see if the data look good. One way to do this is by seeing whether or not the signals in each sample correlate with each other in ways you expect.*
