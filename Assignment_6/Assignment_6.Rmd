@@ -92,21 +92,30 @@ ggplot(data =samples, aes(x=time, y = treatment))+
 ```{r}
 # there are many ways you could do this; one of which is using the melt/cast functions from reshape
 
+df<-melt(atacSeqData)
+df$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",df$variable)
+df2 <- aggregate(df$value, list(df$treatment), sum)
+
+colnames(df2) <- c("treatment", "reads")
+ggplot(data =df2, aes(x=treatment, y = reads))+
+  geom_point()
 ```
 
 ### `#?#` *Which sample has the most coverage? - 0.5 pt*
 ```{r}
-
+max(df2$reads)
 ```
 
 ### `#?#` *Which sample has the least? - 0.5 pt*
 ```{r}
-
+min(df2$reads)
 ```
 
 ### `#?#` *What is the % difference between the max and min (relative to the min)? - 0.5 pt*
 ```{r}
-
+differenc <- max(df2$reads) - min(df2$reads)
+perc <- differenc/min(df2$reads) * 100
+perc
 ```
 
 *In cases where samples have vastly different coverage, you can potentially down-sample the higher-coverage samples. Sometimes, throwing out the data in this way can also introduce new problems, so we're going to stick with the data we have.*
@@ -115,7 +124,9 @@ ggplot(data =samples, aes(x=time, y = treatment))+
 
 ### `#?#` *Create a new data.frame containing only the BI_protac and control samples - 1 pt*
 ```{r}
-
+df3<-melt(atacSeqData)
+df3$treatment = gsub("(R[12])_([0-9]+[minh]+)_(.*)$","\\3",df3$variable)
+stuff <- filter(df3, treatment == "BI_protac" | treatment == "control")
 
 ```
 
