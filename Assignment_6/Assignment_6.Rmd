@@ -219,7 +219,7 @@ countMatrix[is.na(countMatrix)] <- 0
 
 *EdgeR is exceptionally versatile, with many different options for analysis. Today, you're going to use the GLM-quasi-likelihood approach to calculate differential accessibility. We are providing the first example analysis below, which you can modify in subsequent steps. You will need to understand what the steps do, so read the appropriate documentation. *
 ```{r}
-curSamples = samples[match(colnames(countMatrix), samples$ID),];
+curSamples = samples[match(colnames(countMatrix), samples$ID),]; #some comments are added by Abhishek
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
 y = calcNormFactors(y) #Calculate normalization factors to scale the raw library sizes.
 designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)   #returning a dense or sparse object of class
