@@ -207,17 +207,24 @@ Before we had 26219406 peaks but now we have 22415384 peaks.
 
 ### `#?#` *Make a count matrix called `countMatrix` for the BI_protac and control samples, including only the peaks we retained above - 2 pt*
 ```{r}
+library(reshape2)
+library(dplyr)
+countMatrix <- dcast(filteredData, region~variable)
+rownames<-(countMatrix$region)
+countMatrix <- subset(countMatrix, select = -region)
+countMatrix <- as.matrix(countMatrix)
+countMatrix[is.na(countMatrix)] <- 0
 
 ```
 
 *EdgeR is exceptionally versatile, with many different options for analysis. Today, you're going to use the GLM-quasi-likelihood approach to calculate differential accessibility. We are providing the first example analysis below, which you can modify in subsequent steps. You will need to understand what the steps do, so read the appropriate documentation. *
 ```{r}
-curSamples = samples[match(names(countMatrix), samples$ID),];
+curSamples = samples[match(colnames(countMatrix), samples$ID),];
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
-y = calcNormFactors(y)
-designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)  
+y = calcNormFactors(y) #Calculate normalization factors to scale the raw library sizes.
+designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)   #returning a dense or sparse object of class
 # we are using timeName here to make sure that time is treated as a categorical variable. Had we more time points it might make sense to treat time as a value.
-y = estimateDisp(y, designPaired)
+y = estimateDisp(y, designPaired) #Maximizes the negative binomial likelihood to give the estimate of the common, trended and tagwise dispersions across all tags.
 fitPaired = glmQLFit(y, designPaired)
 qlfPairedTime6vs24 = glmQLFTest(fitPaired, coef=3) 
 qlfPairedTreatControlvsProtac = glmQLFTest(fitPaired, coef=2)
@@ -233,12 +240,12 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 
 ### `#?#` *Make an MA plot for allDEStatsPairedTreatControlvsProtac -2pt*
 ```{r}
-
+maPlot(logFC = allDEStatsPairedTreatControlvsProtac$logFC, logAbundance = allDEStatsPairedTreatControlvsProtac$logCPM)
 ```
 
 ### `#?#` *Make an MA plot for allDEStatsPairedTime6vs24 - 1 pt*
 ```{r}
-
+maPlot(logFC = allDEStatsPairedTime6vs24$logFC, logAbundance = allDEStatsPairedTime6vs24$logCPM)
 ```
 
 *Now we're going to test loess normalization instead.* 
