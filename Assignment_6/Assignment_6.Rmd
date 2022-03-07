@@ -216,7 +216,7 @@ df <- data.frame(CPM_control_R1_24, CPM_protac_R1_24, CPM_control_R1_6, CPM_prot
 
 corr_mat <- cor(df)
 melted_cormat <- melt(corr_mat)
-ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
 ```
 
 ### `#?#` *What do you expect the correlations between replicates to look like? Is that what you see? - 2 pt*
@@ -313,9 +313,10 @@ legend( x = "topright", legend=c("y=0", "loess line of best fit"),
 ```{r}
 #Note: the Bioconductor package csaw implements loess regularization in a way that is compatible with edgeR
 ## Tip: use the csaw library to implement the loess regularization
+library(csaw)
 curSamples = samples[match(colnames(countMatrix), samples$ID),]; #some comments are added by Abhishek
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
-y = normOffsets(y, method = "loess") #Calculate normalization factors to scale the raw library sizes.
+y = normOffsets(y) #Calculate normalization factors to scale the raw library sizes.
 designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)   #returning a dense or sparse object of class
 # we are using timeName here to make sure that time is treated as a categorical variable. Had we more time points it might make sense to treat time as a value.
 y = estimateDisp(y, designPaired) #Maximizes the negative binomial likelihood to give the estimate of the common, trended and tagwise dispersions across all tags.
@@ -365,7 +366,7 @@ The first normalization used the calcNormFactors method to calculate normalizati
 #note that the names of your peaks are of the format <chr>:<startPos>-<endPos>
 ## Tip: lookinto the GenomicRanges documentation 
 library(GenomicRanges)
-
+gr <- as(atacSeqData$region, "GRanges")
 
 ```
 
@@ -374,8 +375,9 @@ library(GenomicRanges)
 *See for relevant documentation: https://bioconductor.org/packages/release/workflows/vignettes/sequencing/inst/doc/sequencing.html *
 ```{r}
 ## Tip: Use the Biostring library 
+#BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")# if not installed
 library(BSgenome.Hsapiens.UCSC.hg38)
-
+genome <- BSgenome.Hsapiens.UCSC.hg38
 ```
 
 
@@ -432,7 +434,7 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 ### `#?#` *How many differential peaks did you find (FDR<0.01). - 1 pt*
 ```{r}
-
+diff
 
 ```
 
