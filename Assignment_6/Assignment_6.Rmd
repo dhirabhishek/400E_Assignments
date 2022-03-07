@@ -141,8 +141,8 @@ protac_reads_R1_6 <- downsampledSeqData[downsampledSeqData$variable == "R1_6h_BI
 control_reads_R1_6 <- downsampledSeqData[downsampledSeqData$variable == "R1_6h_control", ]
 protac_reads_R2_24 <- downsampledSeqData[downsampledSeqData$variable == "R2_24h_BI_protac", ]
 control_reads_R2_24 <- downsampledSeqData[downsampledSeqData$variable == "R2_24h_control", ]
-protac_reads_R2_6 <- downsampledSeqData[downsampledSeqData$variable == "R1_6h_BI_protac", ]
-control_reads_R2_6 <- downsampledSeqData[downsampledSeqData$variable == "R1_6h_control", ]
+protac_reads_R2_6 <- downsampledSeqData[downsampledSeqData$variable == "R2_6h_BI_protac", ]
+control_reads_R2_6 <- downsampledSeqData[downsampledSeqData$variable == "R2_6h_control", ]
 
 CPM_protac_R1_24 <- cpm(protac_reads_R1_24$value)
 CPM_control_R1_24 <- cpm(control_reads_R1_24$value)
@@ -150,11 +150,12 @@ CPM_protac_R1_6 <- cpm(protac_reads_R1_6$value)
 CPM_control_R1_6 <- cpm(control_reads_R1_6$value)
 CPM_protac_R2_24 <- cpm(protac_reads_R2_24$value)
 CPM_control_R2_24 <- cpm(control_reads_R2_24$value)
-CPM_protac_R2_6 <- cpm(protac_reads_R1_6$value)
-CPM_control_R2_6 <- cpm(control_reads_R1_6$value)
+CPM_protac_R2_6 <- cpm(protac_reads_R2_6$value)
+CPM_control_R2_6 <- cpm(control_reads_R2_6$value)
 
-readCoverageProtac$CPM_protac <- readCoverageProtac$x/1000000
-readCoverageControl$CPM_control <- readCoverageControl$x/1000000
+#readCoverageProtac$CPM_protac <- readCoverageProtac$x/1000000
+#readCoverageControl$CPM_control <- readCoverageControl$x/1000000
+
 ```
 
 
@@ -189,10 +190,10 @@ plot(density(log(CPM_protac_R1_24+1)), type = "l", col = "red")
 lines(density(log(CPM_control_R1_24+1)),col="blue")
 lines(density(log(CPM_protac_R1_6+1)), col = "green")
 lines(density(log(CPM_control_R1_6+1)), col = "orange")
-lines(density(log(CPM_protac_R1_6+1)), col = "pink")
-lines(density(log(CPM_control_R1_6+1)), col = "yellow")
-lines(density(log(CPM_protac_R1_6+1)), col = "purple")
-lines(density(log(CPM_control_R1_6+1)), col = "black")
+lines(density(log(CPM_protac_R2_6+1)), col = "pink")
+lines(density(log(CPM_control_R2_6+1)), col = "yellow")
+lines(density(log(CPM_protac_R2_6+1)), col = "purple")
+lines(density(log(CPM_control_R2_6+1)), col = "black")
 legend( x = "topright", legend=c("control_R1_24", "BI_protac_R1_24", "control_R1_6", "control_R1_6", "control_R2_24", "BI_protac_R2_24", "control_R2_6", "control_R2_6"), 
         col=c("blue", "red", "green", "orange", "pink", "yellow", "purple", "black"), pch=c("-","-", "-","-", "-","-", "-","-"))
 ```
@@ -215,8 +216,7 @@ df <- data.frame(CPM_control_R1_24, CPM_protac_R1_24, CPM_control_R1_6, CPM_prot
 
 corr_mat <- cor(df)
 melted_cormat <- melt(corr_mat)
-ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) +
-  geom_tile()
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
 ```
 
 ### `#?#` *What do you expect the correlations between replicates to look like? Is that what you see? - 2 pt*
@@ -285,11 +285,25 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 ### `#?#` *Make an MA plot for allDEStatsPairedTreatControlvsProtac -2pt*
 ```{r}
 maPlot(logFC = allDEStatsPairedTreatControlvsProtac$logFC, logAbundance = allDEStatsPairedTreatControlvsProtac$logCPM)
+
+ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTreatControlvsProtac)
+j <- order(allDEStatsPairedTreatControlvsProtac$logCPM)
+lines(allDEStatsPairedTreatControlvsProtac$logCPM[j], ll1$fitted[j], col="red")
+abline(h=0, col = "green")
+legend( x = "topright", legend=c("y=0", "loess line of best fit"), 
+        col=c("green", "red"), pch=c("-","-"))
 ```
 
 ### `#?#` *Make an MA plot for allDEStatsPairedTime6vs24 - 1 pt*
 ```{r}
 maPlot(logFC = allDEStatsPairedTime6vs24$logFC, logAbundance = allDEStatsPairedTime6vs24$logCPM)
+
+ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTime6vs24)
+j <- order(allDEStatsPairedTime6vs24$logCPM)
+lines(allDEStatsPairedTime6vs24$logCPM[j], ll1$fitted[j], col="red")
+abline(h=0, col = "green")
+legend( x = "topright", legend=c("y=0", "loess line of best fit"), 
+        col=c("green", "red"), pch=c("-","-"))
 ```
 
 *Now we're going to test loess normalization instead.* 
@@ -299,7 +313,24 @@ maPlot(logFC = allDEStatsPairedTime6vs24$logFC, logAbundance = allDEStatsPairedT
 ```{r}
 #Note: the Bioconductor package csaw implements loess regularization in a way that is compatible with edgeR
 ## Tip: use the csaw library to implement the loess regularization
+countMatrix <- as.matrix(countMatrix)
+curSamples = samples[match(colnames(countMatrix), samples$ID),]; #some comments are added by Abhishek
+y = DGEList(counts=countMatrix, group=curSamples$treatment)
 
+
+y = normOffsets(countMatrix) #Calculate normalization factors to scale the raw library sizes.
+designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)   #returning a dense or sparse object of class
+# we are using timeName here to make sure that time is treated as a categorical variable. Had we more time points it might make sense to treat time as a value.
+y = estimateDisp(y, designPaired) #Maximizes the negative binomial likelihood to give the estimate of the common, trended and tagwise dispersions across all tags.
+fitPaired = glmQLFit(y, designPaired)
+qlfPairedTime6vs24 = glmQLFTest(fitPaired, coef=3) 
+qlfPairedTreatControlvsProtac = glmQLFTest(fitPaired, coef=2)
+
+allDEStatsPairedTreatControlvsProtac = as.data.frame(topTags(qlfPairedTreatControlvsProtac,n=nrow(countMatrix)))
+allDEStatsPairedTreatControlvsProtac$region=row.names(allDEStatsPairedTreatControlvsProtac)
+
+allDEStatsPairedTime6vs24 = as.data.frame(topTags(qlfPairedTime6vs24,n=nrow(countMatrix)))
+allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 
 ```
 
