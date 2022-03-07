@@ -315,7 +315,7 @@ legend( x = "topright", legend=c("y=0", "loess line of best fit"),
 ## Tip: use the csaw library to implement the loess regularization
 curSamples = samples[match(colnames(countMatrix), samples$ID),]; #some comments are added by Abhishek
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
-y = normOffsets(y) #Calculate normalization factors to scale the raw library sizes.
+y = normOffsets(y, method = "loess") #Calculate normalization factors to scale the raw library sizes.
 designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)   #returning a dense or sparse object of class
 # we are using timeName here to make sure that time is treated as a categorical variable. Had we more time points it might make sense to treat time as a value.
 y = estimateDisp(y, designPaired) #Maximizes the negative binomial likelihood to give the estimate of the common, trended and tagwise dispersions across all tags.
