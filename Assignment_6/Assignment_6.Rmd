@@ -216,7 +216,7 @@ df <- data.frame(CPM_control_R1_24, CPM_protac_R1_24, CPM_control_R1_6, CPM_prot
 
 corr_mat <- cor(df)
 melted_cormat <- melt(corr_mat)
-ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
+ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
 ```
 
 ### `#?#` *What do you expect the correlations between replicates to look like? Is that what you see? - 2 pt*
@@ -313,12 +313,9 @@ legend( x = "topright", legend=c("y=0", "loess line of best fit"),
 ```{r}
 #Note: the Bioconductor package csaw implements loess regularization in a way that is compatible with edgeR
 ## Tip: use the csaw library to implement the loess regularization
-countMatrix <- as.matrix(countMatrix)
 curSamples = samples[match(colnames(countMatrix), samples$ID),]; #some comments are added by Abhishek
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
-
-
-y = normOffsets(countMatrix) #Calculate normalization factors to scale the raw library sizes.
+y = normOffsets(y) #Calculate normalization factors to scale the raw library sizes.
 designPaired = model.matrix(~curSamples$treatment + curSamples$timeName)   #returning a dense or sparse object of class
 # we are using timeName here to make sure that time is treated as a categorical variable. Had we more time points it might make sense to treat time as a value.
 y = estimateDisp(y, designPaired) #Maximizes the negative binomial likelihood to give the estimate of the common, trended and tagwise dispersions across all tags.
@@ -336,13 +333,27 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 
 ### `#?#` *Make the same two MA plots as before, but this time using the loess normalized analysis - 1 pt*
 ```{r}
+maPlot(logFC = allDEStatsPairedTreatControlvsProtac$logFC, logAbundance = allDEStatsPairedTreatControlvsProtac$logCPM)
 
+ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTreatControlvsProtac)
+j <- order(allDEStatsPairedTreatControlvsProtac$logCPM)
+lines(allDEStatsPairedTreatControlvsProtac$logCPM[j], ll1$fitted[j], col="red")
+abline(h=0, col = "green")
+legend( x = "topright", legend=c("y=0", "loess line of best fit"), 
+        col=c("green", "red"), pch=c("-","-"))
 
+maPlot(logFC = allDEStatsPairedTime6vs24$logFC, logAbundance = allDEStatsPairedTime6vs24$logCPM)
 
+ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTime6vs24)
+j <- order(allDEStatsPairedTime6vs24$logCPM)
+lines(allDEStatsPairedTime6vs24$logCPM[j], ll1$fitted[j], col="red")
+abline(h=0, col = "green")
+legend( x = "topright", legend=c("y=0", "loess line of best fit"), 
+        col=c("green", "red"), pch=c("-","-"))
 ```
 
 ### `#?#` *What was the first normalization method? What changed in the MA plots? Which analysis do you think is more reliable and why? - 4 pt*
-
+The first normalization used the calcNormFactors method to calculate normalization factors, which according to the documentation normalizes by the TMM method, which trims the means of the M-values, which are weighted using the inverse variances of the variables. Since we didn't set refColumn, the column with the CPM upper quartile closest to the mean upper quartile was used as a reference library to scale the observed library. Using the loess regulariazation, the plot generated look similar, but in the upper and lower left hand corners the previously linear lines have been evened out, and the data points are more scattered. 
 
 
 # Part 4: GC bias
@@ -353,7 +364,7 @@ allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
 ```{r}
 #note that the names of your peaks are of the format <chr>:<startPos>-<endPos>
 ## Tip: lookinto the GenomicRanges documentation 
-
+library(GenomicRanges)
 
 
 ```
