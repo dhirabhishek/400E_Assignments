@@ -381,6 +381,7 @@ gr <- as(atacSeqData$region, "GRanges")
 #BiocManager::install("BSgenome.Hsapiens.UCSC.hg38")# if not installed
 library(BSgenome.Hsapiens.UCSC.hg38)
 genome <- BSgenome.Hsapiens.UCSC.hg38
+j<-getSeq(genome, gr)
 ```
 
 
@@ -389,24 +390,40 @@ genome <- BSgenome.Hsapiens.UCSC.hg38
 ### `#?#` *Create scatter plots (one per sample, e.g. using facet_wrap), including lines of best fit (GAM), where each plot shows GC content (x axis) vs CPM (y axis) for each peak (points) -2pt*
 ```{r}
 #please limit the y axis to between 0 and 50
+alf <- as.data.frame(alphabetFrequency(j))
+#alf$Name <- gr
+alf$Width <- width(j)
+alf$gc <- (alf$C+alf$G) / (alf$C+alf$G+alf$A+alf$T)
+alf$region <- atacSeqData$region
 
+df2 <- data.frame(alf$gc, CPM_control_R1_24, CPM_protac_R1_24, CPM_control_R1_6, CPM_protac_R1_6, CPM_control_R2_24, CPM_protac_R2_24, CPM_control_R2_6, CPM_protac_R2_6)
+meltedDF2 <- melt(df2, id.vars = "alf.gc")
+
+ggplot(data = meltedDF2, aes(alf.gc, value)) +
+  geom_line()+
+  geom_point() + 
+  labs(title = "CPM vs GC content",
+       y = "CPM", x = "GC Content") +
+      facet_wrap(~variable)
 ```
 
 ### `#?#` *Repeat the above, but this time showing only the lines of best fit and all on the same plot - 2 pt*
-```{r}
 
+```{r}
+ggplot(data = meltedDF2, aes(alf.gc, value)) +
+  geom_line()+
+  labs(title = "CPM vs GC content",
+       y = "CPM", x = "GC Content")
 ```
 
 
 ### `#?#` *Given this result, predict whether we will see a significant relationship between GC content and logFC in our differential peak analysis (loess-normalized). Justify your prediction. Predicting "wrong" will not be penalized, as long as your justification is correct. Don't retroactively change your answer. - 2 pt*
-
-
+We don't think there will be a significant relationship between GC content and the logFC in our differential peak analysis. The CPM and GC don't seem to have an obvious relation from the graphs above. 
 
 
 
 ### `#?#` *Plot the relationship between GC and logFC for the loess-normalized ControlvsProtac analysis. Also include a line of best fit (blue) and y=0 (red) - 2 pt*
 ```{r}
-
 ```
 
 ### `#?#` *Now plot the same thing for the NON loess-normalized ControlvsProtac analysis. - 1 pt*
