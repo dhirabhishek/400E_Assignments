@@ -327,30 +327,30 @@ fitPaired = glmQLFit(y, designPaired)
 qlfPairedTime6vs24 = glmQLFTest(fitPaired, coef=3) 
 qlfPairedTreatControlvsProtac = glmQLFTest(fitPaired, coef=2)
 
-allDEStatsPairedTreatControlvsProtac = as.data.frame(topTags(qlfPairedTreatControlvsProtac,n=nrow(countMatrix)))
-allDEStatsPairedTreatControlvsProtac$region=row.names(allDEStatsPairedTreatControlvsProtac)
+allDEStatsPairedTreatControlvsProtac2 = as.data.frame(topTags(qlfPairedTreatControlvsProtac,n=nrow(countMatrix)))
+allDEStatsPairedTreatControlvsProtac2$region=row.names(allDEStatsPairedTreatControlvsProtac2)
 
-allDEStatsPairedTime6vs24 = as.data.frame(topTags(qlfPairedTime6vs24,n=nrow(countMatrix)))
-allDEStatsPairedTime6vs24$region=row.names(allDEStatsPairedTime6vs24)
+allDEStatsPairedTime6vs242 = as.data.frame(topTags(qlfPairedTime6vs24,n=nrow(countMatrix)))
+allDEStatsPairedTime6vs242$region=row.names(allDEStatsPairedTime6vs242)
 
 ```
 
 ### `#?#` *Make the same two MA plots as before, but this time using the loess normalized analysis - 1 pt*
 ```{r}
-maPlot(logFC = allDEStatsPairedTreatControlvsProtac$logFC, logAbundance = allDEStatsPairedTreatControlvsProtac$logCPM)
+maPlot(logFC = allDEStatsPairedTreatControlvsProtac2$logFC, logAbundance = allDEStatsPairedTreatControlvsProtac2$logCPM)
 
-ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTreatControlvsProtac)
-j <- order(allDEStatsPairedTreatControlvsProtac$logCPM)
-lines(allDEStatsPairedTreatControlvsProtac$logCPM[j], ll1$fitted[j], col="red")
+ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTreatControlvsProtac2)
+j <- order(allDEStatsPairedTreatControlvsProtac2$logCPM)
+lines(allDEStatsPairedTreatControlvsProtac2$logCPM[j], ll1$fitted[j], col="red")
 abline(h=0, col = "green")
 legend( x = "topright", legend=c("y=0", "loess line of best fit"), 
         col=c("green", "red"), pch=c("-","-"))
 
-maPlot(logFC = allDEStatsPairedTime6vs24$logFC, logAbundance = allDEStatsPairedTime6vs24$logCPM)
+maPlot(logFC = allDEStatsPairedTime6vs242$logFC, logAbundance = allDEStatsPairedTime6vs242$logCPM)
 
-ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTime6vs24)
-j <- order(allDEStatsPairedTime6vs24$logCPM)
-lines(allDEStatsPairedTime6vs24$logCPM[j], ll1$fitted[j], col="red")
+ll1 <- loess(logFC ~ logCPM, data = allDEStatsPairedTime6vs242)
+j <- order(allDEStatsPairedTime6vs242$logCPM)
+lines(allDEStatsPairedTime6vs242$logCPM[j], ll1$fitted[j], col="red")
 abline(h=0, col = "green")
 legend( x = "topright", legend=c("y=0", "loess line of best fit"), 
         col=c("green", "red"), pch=c("-","-"))
@@ -399,42 +399,59 @@ alf$region <- atacSeqData$region
 df2 <- data.frame(alf$gc, CPM_control_R1_24, CPM_protac_R1_24, CPM_control_R1_6, CPM_protac_R1_6, CPM_control_R2_24, CPM_protac_R2_24, CPM_control_R2_6, CPM_protac_R2_6)
 meltedDF2 <- melt(df2, id.vars = "alf.gc")
 
-ggplot(data = meltedDF2, aes(alf.gc, value)) +
-  geom_line()+
-  geom_point() + 
+ggplot(data = meltedDF2, aes(alf.gc, value)) + ylim(0, 50) +
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(size = 0.1) + 
   labs(title = "CPM vs GC content",
        y = "CPM", x = "GC Content") +
       facet_wrap(~variable)
 ```
 
 ### `#?#` *Repeat the above, but this time showing only the lines of best fit and all on the same plot - 2 pt*
-
 ```{r}
-ggplot(data = meltedDF2, aes(alf.gc, value)) +
-  geom_line()+
+
+ggplot(data = meltedDF2, aes(alf.gc, value))+ ylim(0,50) +
+  geom_smooth(method = "lm", se = FALSE) +geom_point(size = 0.1) + 
   labs(title = "CPM vs GC content",
        y = "CPM", x = "GC Content")
 ```
 
 
 ### `#?#` *Given this result, predict whether we will see a significant relationship between GC content and logFC in our differential peak analysis (loess-normalized). Justify your prediction. Predicting "wrong" will not be penalized, as long as your justification is correct. Don't retroactively change your answer. - 2 pt*
-We don't think there will be a significant relationship between GC content and the logFC in our differential peak analysis. The CPM and GC don't seem to have an obvious relation from the graphs above. 
+We 're not sure if there will be a significant relationship between GC content and the logFC in our differential peak analysis. The CPM and GC don't seem to have an obvious relation from the graphs above. The graps are very crowded. 
 
 
 
 ### `#?#` *Plot the relationship between GC and logFC for the loess-normalized ControlvsProtac analysis. Also include a line of best fit (blue) and y=0 (red) - 2 pt*
 ```{r}
+gr <- as(rownames(countMatrix), "GRanges")
+j2<-getSeq(genome, gr)
+alf2 <- as.data.frame(alphabetFrequency(j2))
+alf2$gc <- (alf2$C+alf2$G) / (alf2$C+alf2$G+alf2$A+alf2$T)
+alf2$logFc <- allDEStatsPairedTreatControlvsProtac$logFC
+ggplot(data = alf2, aes(gc, logFc)) +geom_smooth(method = "lm", se = FALSE) +
+  geom_point(size = 0.1) +  geom_hline(yintercept=0, col = "red")
+  labs(title = "logFC vs GC content",
+       y = "logFC", x = "GC Content")
 ```
 
 ### `#?#` *Now plot the same thing for the NON loess-normalized ControlvsProtac analysis. - 1 pt*
 ```{r}
-
+gr <- as(rownames(countMatrix), "GRanges")
+j2<-getSeq(genome, gr)
+alf2 <- as.data.frame(alphabetFrequency(j2))
+alf2$gc <- (alf2$C+alf2$G) / (alf2$C+alf2$G+alf2$A+alf2$T)
+alf2$logFc <- allDEStatsPairedTreatControlvsProtac2$logFC
+ggplot(data = alf2, aes(gc, logFc)) +geom_smooth(method = "lm", se = FALSE) +
+  geom_point(size = 0.1) +  geom_hline(yintercept=0, col = "red")
+  labs(title = "logFC vs GC content",
+       y = "logFC", x = "GC Content")
 
 ```
 
 
 ### `#?#` *Was your prediction correct? Do you think we should also account for GC normalization in our differential ATAC analysis? Why/why not? - 3 pt*
-
+The Loess normalization looks like it made the data more uniform, so it may be useful to account for GC normalization in our differential ATAc analysis. 
 
 
 *We will leave GC normalization as an optional exercise, and will not actually do it here.*
