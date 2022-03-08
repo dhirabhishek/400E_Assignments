@@ -1,5 +1,5 @@
 ---
-title: 'Assignment 7: PGS'
+title: 'Assignment 7 KEY: PGS'
 output:
   github_document:
     toc: true
@@ -10,17 +10,16 @@ output:
 
 In this assignment we will learn about population stratification, imputation of genotypes, and using polygenic scores.  Polygenic scores (PGSs) can be useful for predicting disease susceptibility. In order to calculate PGSs, we need two things: GWAS summary statistics (including effect sizes), and genotypes. Most of the time, only a subset of a person's genotypes are actually measured (e.g. via SNP array), and so we must impute the rest using a matched population of fully genotyped individuals. This is the goal of Assignment 7.
 
-Throughout the assignment we will be using a Mini Cohort that has genetic data and some phenotypic variables, together with the 1000 Genomes Project samples. Both datasets are in bfile plink format, which encompasses 3 files: *.bim, .bed and .fam* all the files can be located under the following path: */usr/local/share/data/assignment_7/*
+Throughout the assignment we will be using a Mini Cohort that has genetic data and some phenotypic variables, together with the 1000 Genomes Project samples. Both datasets are in bfile plink format, which encompasses 3 files: *.bim, .bed and .fam* all the files can be located under the following path: */projects/bmeg/A7*
 
 
 # Getting Ready 
 
-In this assignment, we will be using the plink tool extensively. A plink tutorial can be found here: https://zzz.bwh.harvard.edu/plink/tutorial.shtml
+In this assignment, you will use the plink tool extensively. A plink tutorial can be found here: https://zzz.bwh.harvard.edu/plink/tutorial.shtml
 
 ```{bash, eval=FALSE}
 
 ## Install plink1.9 onto your A1 conda environment:
-conda install -n BMEDG_1 -c bioconda plink
 
 ```
 
@@ -40,6 +39,7 @@ Before we can start working on the genetic data, we need to ensure that the qual
    
 
 ```{bash, eval=FALSE}
+
 ## Using only one run of plink 1.9 (with different flags)
 ## 1. Filter out -SNPs- with more than 5% missingness
 ## 2. Filter out -variants- with less than 1% MAF
@@ -47,7 +47,6 @@ Before we can start working on the genetic data, we need to ensure that the qual
 ## 4. Create an output file in bfile format (which contains the bed, fam and bim files) for the MiniCohort QCed data
 
 #?# Type the command you used below: - 3pt
-
 
 ```
 
@@ -67,19 +66,22 @@ We first need to ensure that only the most informative genetic variants are used
 ```{bash, eval=FALSE}
 
 ## Using only one run of plink 1.9 (with different flags)
-## 1. Filter out the high-LD regions contained in the --high_LD_regions_hg19.txt-- file, located in /usr/local/share/data/assignment_7/
+## 1. Filter out the high-LD regions contained in the --high_LD_regions_hg19.txt-- file, located in /projects/bmeg/A7/
 ## 2. Use the --indep-pairwise to do LD prunning with the following parameters:
 ## - Window size: 200, 
 ## - Variant Count: 100 
 ## - VIF (variance inflation factor): 0.2 
 #?# Type the command you use to create the Mini Cohort PCA-QCed bfile below: - 1pt
-
+ 
 
 ## Use the output -.prune.in- file to extract only the informative variants and create a new bfile format (bed, fam and bim files) from:
 ## 1. The General MiniCohort QC bfile created before
-## 2. The 1KGP_reference bfile located in /usr.local/share/data/assignment_7/
+## 2. The 1KGP_reference bfile located in /projects/bmeg/A7/
 
 #?# Type the commands you used below: - 3pt
+
+
+
 
 
 ```
@@ -105,20 +107,18 @@ To assess the ethnic diversity in our cohort, we will use One-thousand Genome Pr
 
 ```{r}
 
-## Copy the PCA .eigenvec file to your computer, together with the samples_info.txt located in /usr/local/share/data/assignment_7/
+## Copy the PCA .eigenvec file to your computer, together with the samples_info.txt located in /projects/bmeg/A7/
 
 ## Load the .eigenvec file onto R, change the column names to: FID, IID, PC1, PC2, PC3, ..., PC20
 #?# Type the command you used below: - 1pt
 
-
 ## Load the samples_info.txt file onto R, change the column names to: FID, IID, SuperPopulation, Population
-#?# Tyoe the commands you used below: - 1pt
+#?# Type the commands you used below: - 1pt
 
 
 ## Merge the .eigenvec and sample_info data.frames together using the IID column
 ## Tip: Look into the -merge- function!
 #?# Type the command you used below: - 1pt
-
 
 ## Using ggplot create a scatterplot, using: 
 ## x-axis: PC1
@@ -127,11 +127,11 @@ To assess the ethnic diversity in our cohort, we will use One-thousand Genome Pr
 #?# Type the command you used below: 1pt
 
 
-
 #?# Where do the cohort samples fall? Are they all clustered together? - 1 pt
 
 
 #?# Which Population would you use as a reference for imputation?, Why? - 1 pt
+
 
 #?# Do you think looking at the top two PCs is sufficient to tell what population is best? Why/why not? - 2 pt
 
@@ -140,12 +140,12 @@ To assess the ethnic diversity in our cohort, we will use One-thousand Genome Pr
 
 # Imputation
 
-Imputation of genetic data is a very computationally intensive analysis, that can take a long time. So we have performed it for you. Using the chromosome 17 imputation information located in */usr/local/share/data/assignment_7/* under the *Mini_cohort_chr17_imputation_results.info.gz* we will calculate some post-imputation metrics. 
+Imputation of genetic data is a very computationally intensive analysis, that can take a long time. So we have performed it for you. Using the chromosome 17 imputation information located in */projects/bmeg/A7/* under the *Mini_cohort_chr17_imputation_results.info.gz* we will calculate some post-imputation metrics. 
 
 ```{r}
 ## Load the Mini_cohort_chr17_imputation_results.info.gz file to your Rstudio environment 
-
-
+chr_info <- read.table(file = "/Users/paola.arguello/Documents/BMEDG400/Assignment_Keys/2021Jan/Assignment_7/Mini_cohort_chr17_imputation_results.info.gz",
+                             header = TRUE)
 ## Use the information in the file to answer the following questions. Accompany each of the answers with the code you used to get to them and a brief explanation of your thought process behind.
 #?# What is the percentage of imputed SNPs? 0.5 pt
 
@@ -192,11 +192,11 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 #?# Include your rationale and the documented code you used - 5pt
 
 
+
 #?# Use ggplot to plot the distribution of the Tapas PGS: - 2 pt
 ## Include the code and the graph in your analysis! 
 ## Tip: http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/
-
-
+ 
 
 
 #?# What is the distribution of the tapas PGS? - 1pt
@@ -214,11 +214,23 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 
 
 
-#?# What is the correlation coeficient between the PGS and Tapas enjoyability? Is Spearman or Pearson correlation more appropriate here? Why? - 3 pt
+#?# What is the correlation coefficient between the PGS and Tapas enjoyability? Is Spearman or Pearson correlation more appropriate here? Why? - 3 pt
+
 
 
 #?# How predictive is the PGS for tapas preference? Include in your answer why do you think it is/isn't accurate and what could affect its predicitvity - 2pt 
 
 
 ```
+
+
+# Authors and contributions
+
+Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
+
+Authors: Name1 (studentID1) and Name2 (studentID2)
+
+Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
+
+
 
