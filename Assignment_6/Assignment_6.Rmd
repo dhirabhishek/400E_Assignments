@@ -152,6 +152,7 @@ CPM_protac_R2_24 <- cpm(protac_reads_R2_24$value)
 CPM_control_R2_24 <- cpm(control_reads_R2_24$value)
 CPM_protac_R2_6 <- cpm(protac_reads_R2_6$value)
 CPM_control_R2_6 <- cpm(control_reads_R2_6$value)
+print(max(CPM_control_R1_24))
 
 #readCoverageProtac$CPM_protac <- readCoverageProtac$x/1000000
 #readCoverageControl$CPM_control <- readCoverageControl$x/1000000
@@ -216,7 +217,7 @@ df <- data.frame(CPM_control_R1_24, CPM_protac_R1_24, CPM_control_R1_6, CPM_prot
 
 corr_mat <- cor(df)
 melted_cormat <- melt(corr_mat)
-ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
+ggplot(data = melted_cormat, aes(x=X1, y=X2, fill=value)) + theme(text = element_text(size=10), axis.text.x = element_text(angle=90, hjust=1)) + geom_tile()
 ```
 
 ### `#?#` *What do you expect the correlations between replicates to look like? Is that what you see? - 2 pt*
@@ -254,15 +255,17 @@ Before we had 26219406 peaks but now we have 22415384 peaks.
 library(reshape2)
 library(dplyr)
 countMatrix <- dcast(filteredData, region~variable)
-rownames<-(countMatrix$region)
+rownames(countMatrix)<-(countMatrix$region)
 countMatrix <- subset(countMatrix, select = -region)
 countMatrix <- as.matrix(countMatrix)
-countMatrix[is.na(countMatrix)] <- 0
+#countMatrix[is.na(countMatrix)] <- 0
+countMatrix <- na.omit(countMatrix)
 
 ```
 
 *EdgeR is exceptionally versatile, with many different options for analysis. Today, you're going to use the GLM-quasi-likelihood approach to calculate differential accessibility. We are providing the first example analysis below, which you can modify in subsequent steps. You will need to understand what the steps do, so read the appropriate documentation. *
 ```{r}
+
 curSamples = samples[match(colnames(countMatrix), samples$ID),]; #some comments are added by Abhishek
 y = DGEList(counts=countMatrix, group=curSamples$treatment)
 y = calcNormFactors(y) #Calculate normalization factors to scale the raw library sizes.
@@ -434,12 +437,19 @@ genome <- BSgenome.Hsapiens.UCSC.hg38
 
 ### `#?#` *How many differential peaks did you find (FDR<0.01). - 1 pt*
 ```{r}
-diff
+pairedControlvsProtacFDR <- allDEStatsPairedTreatControlvsProtac[allDEStatsPairedTreatControlvsProtac$FDR < 0.01,]
 
 ```
 
 ### `#?#` *Make a volcano plot of the allDEStatsPairedTreatControlvsProtac, with -log10(p-value) on the y axis and logFC on the x. Colour points that are significant at an FDR<0.01. - 2 pt*
 ```{r}
+# BiocManager::install('EnhancedVolcano')
+library(EnhancedVolcano)
+allDEStatsPairedTreatControlvsProtac$logPvalue <- -log10(allDEStatsPairedTreatControlvsProtac$PValue)
+keyvals.colour <- ifelse(rownames(allDEStatsPairedTreatControlvsProtac) %in% rownames(pairedControlvsProtacFDR), 'red','transparent')
+names(keyvals.colour)[keyvals.colour == 'red'] <- 'significant'
+EnhancedVolcano(toptable = allDEStatsPairedTreatControlvsProtac, x = 'logFC', y = 'PValue', lab= rownames(allDEStatsPairedTreatControlvsProtac), selectLab = rownames(pairedControlvsProtacFDR),colCustom = keyvals.colour  )
+
 
 
 ```
@@ -449,6 +459,7 @@ diff
 
 ### `#?#` *Plot the logCPM (x axis) by -log10(Pvalue) (y axis), again colouring by FDR<0.01. - 2 pt*
 ```{r}
+EnhancedVolcano(toptable = allDEStatsPairedTreatControlvsProtac, x = 'logCPM', y = 'PValue', lab= rownames(allDEStatsPairedTreatControlvsProtac), selectLab = rownames(pairedControlvsProtacFDR),colCustom = keyvals.colour  )
 
 
 ```
