@@ -20,6 +20,7 @@ In this assignment, you will use the plink tool extensively. A plink tutorial ca
 ```{bash, eval=FALSE}
 
 ## Install plink1.9 onto your A1 conda environment:
+conda install -c bioconda plink
 
 ```
 
@@ -47,7 +48,8 @@ Before we can start working on the genetic data, we need to ensure that the qual
 ## 4. Create an output file in bfile format (which contains the bed, fam and bim files) for the MiniCohort QCed data
 
 #?# Type the command you used below: - 3pt
-
+#TODO not sure about #3
+plink --bfile /projects/bmeg/A7/Mini_cohort --mind 0.05 --maf 0.01 --make-bed --out filtered
 ```
 
 
@@ -67,19 +69,21 @@ We first need to ensure that only the most informative genetic variants are used
 
 ## Using only one run of plink 1.9 (with different flags)
 ## 1. Filter out the high-LD regions contained in the --high_LD_regions_hg19.txt-- file, located in /projects/bmeg/A7/
+
 ## 2. Use the --indep-pairwise to do LD prunning with the following parameters:
 ## - Window size: 200, 
 ## - Variant Count: 100 
 ## - VIF (variance inflation factor): 0.2 
 #?# Type the command you use to create the Mini Cohort PCA-QCed bfile below: - 1pt
- 
+plink --bfile filtered --r --ld-snp-list /projects/bmeg/A7/high_LD_regions_hg19.txt --indep-pairwise 200 100 0.2 --out filtered2
+
 
 ## Use the output -.prune.in- file to extract only the informative variants and create a new bfile format (bed, fam and bim files) from:
 ## 1. The General MiniCohort QC bfile created before
 ## 2. The 1KGP_reference bfile located in /projects/bmeg/A7/
-
 #?# Type the commands you used below: - 3pt
-
+plink --bfile filtered --extract filtered2.prune.in --make-bed --out filtered3
+plink --bfile /projects/bmeg/A7/1kgp_reference --extract filtered2.prune.in --make-bed --out filtered4
 
 
 
@@ -96,10 +100,10 @@ To assess the ethnic diversity in our cohort, we will use One-thousand Genome Pr
 ## Remember to create a new bfile (.fam, .bed and .bim files) that contains the merged data.
 ## IMPORTANT TIME CONSTRAINT: This step can take ~15 minutes, so make sure to check the server status before you run it!
 #?# Type the command you used below: - 1pt
-
+plink --bfile filtered3 --bmerge filtered4 --make-bed --out filtered5
 
 #?# Perform a PCA analysis in plink on the merged set - 1 pt
-
+plink --bfile filtered5 --pca 
 
 ```
 
@@ -111,30 +115,36 @@ To assess the ethnic diversity in our cohort, we will use One-thousand Genome Pr
 
 ## Load the .eigenvec file onto R, change the column names to: FID, IID, PC1, PC2, PC3, ..., PC20
 #?# Type the command you used below: - 1pt
+#scp alzhang_bmeg22@orca1.bcgsc.ca:/projects/bmeg/A7/samples_info.txt /Users/alicezhang/400E_Assignments/Assignment_7/samples_info.txt
+eigenvec_table <- read.table('plink.eigenvec')
+colnames(eigenvec_table) <- c("FID", "IID", "PC1", "PC2", "PC3", "PC4", "PC5", "PC6", "PC7", "PC8", "PC9", "PC10", "PC11", "PC12", "PC13", "PC14", "PC15", "PC16", "PC17", "PC18", "PC19", "PC20")
 
 ## Load the samples_info.txt file onto R, change the column names to: FID, IID, SuperPopulation, Population
 #?# Type the commands you used below: - 1pt
-
+my_data <- read.delim("samples_info.txt")
+colnames(my_data) <- c("IID", "FID", "SuperPopulation", "Population")
 
 ## Merge the .eigenvec and sample_info data.frames together using the IID column
 ## Tip: Look into the -merge- function!
 #?# Type the command you used below: - 1pt
+joined_df <- merge(my_data, eigenvec_table, by = "IID")
 
 ## Using ggplot create a scatterplot, using: 
 ## x-axis: PC1
 ## y-axis: PC2
 ## color: SuperPopulation - to use the Population information to color the samples and be able to appreciate population structure!
 #?# Type the command you used below: 1pt
-
+library(ggplot2)
+ggplot(data = joined_df, aes(PC1, PC2, colour = SuperPopulation))+geom_point()
 
 #?# Where do the cohort samples fall? Are they all clustered together? - 1 pt
-
+#The cohort samples are clustered together on the lefthand side of the graph, near the SAS and AMR superpopulation samples.
 
 #?# Which Population would you use as a reference for imputation?, Why? - 1 pt
-
+#TODO
 
 #?# Do you think looking at the top two PCs is sufficient to tell what population is best? Why/why not? - 2 pt
-
+#TODO
 
 ```
 
@@ -144,24 +154,26 @@ Imputation of genetic data is a very computationally intensive analysis, that ca
 
 ```{r}
 ## Load the Mini_cohort_chr17_imputation_results.info.gz file to your Rstudio environment 
-chr_info <- read.table(file = "/Users/paola.arguello/Documents/BMEDG400/Assignment_Keys/2021Jan/Assignment_7/Mini_cohort_chr17_imputation_results.info.gz",
-                             header = TRUE)
+# chr_info <- read.table(file = "Mini_cohort_chr17_imputation_results.info.gz", header = TRUE)
 ## Use the information in the file to answer the following questions. Accompany each of the answers with the code you used to get to them and a brief explanation of your thought process behind.
 #?# What is the percentage of imputed SNPs? 0.5 pt
-
+print(length( which( (chr_info$Genotyped == "Imputed") ))/length(chr_info$Genotyped))
+# 99.3%
 
 ## The metric of imputation quality is Rsq, this is the estimated value of the squared correlation between imputed and true genotypes. Since true genotypes are not available, this calculation is based on the idea that poorly imputed genotype counts will shrink towards their expectations based on allele frequencies observed in the population (https://genome.sph.umich.edu/wiki/Minimac3_Info_File#Rsq).  An Rsq < 0.3 is often used to flag poorly imputed SNPs. 
 #?# What is the percentage of poorly imputed SNPs?
-
+print(length( which( (chr_info$Rsq < 0.3) ))/length(chr_info$Rsq))
+#63.4%
 
 #?# Create a histogram to visualize the distribution of the MAF - 1 pt
-
-
+hist(chr_info$MAF)
 #?# Which MAF is most frequent? What does that mean? - 1 pt
-
+# 0-0.02. This means that there is a low frequency of the second most common allele occuring in the sample population. This could mean the SNP's major allele is conserved. 
 
 #?# What is the maximum MAF? Why is that? - 1 pt
-
+max(chr_info$MAF)
+#The max MAF is 0.5
+#TODO why?
 
 ```
 
