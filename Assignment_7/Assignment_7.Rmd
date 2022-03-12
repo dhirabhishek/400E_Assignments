@@ -1,5 +1,5 @@
 ---
-title: 'Assignment 7 KEY: PGS'
+title: 'Assignment 7: PGS'
 output:
   github_document:
     toc: true
@@ -73,7 +73,7 @@ We first need to ensure that only the most informative genetic variants are used
 ## 2. Use the --indep-pairwise to do LD prunning with the following parameters:
 ## - Window size: 200, 
 ## - Variant Count: 100 
-## - VIF (variance inflation factor): 0.2 
+## - r^2: 0.2 
 #?# Type the command you use to create the Mini Cohort PCA-QCed bfile below: - 1pt
 plink --bfile filtered --r --ld-snp-list /projects/bmeg/A7/high_LD_regions_hg19.txt --indep-pairwise 200 100 0.2 --out filtered2
 
