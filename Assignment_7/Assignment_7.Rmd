@@ -49,7 +49,7 @@ Before we can start working on the genetic data, we need to ensure that the qual
 
 #?# Type the command you used below: - 3pt
 #TODO not sure about #3
-plink --bfile /projects/bmeg/A7/Mini_cohort --mind 0.05 --maf 0.01 --make-bed --out filtered
+plink --bfile /projects/bmeg/A7/Mini_cohort --mind 0.05 --maf 0.01 --geno 0.02 --make-bed --out filtered
 ```
 
 
