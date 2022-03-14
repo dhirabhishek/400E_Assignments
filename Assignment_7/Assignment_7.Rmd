@@ -48,7 +48,6 @@ Before we can start working on the genetic data, we need to ensure that the qual
 ## 4. Create an output file in bfile format (which contains the bed, fam and bim files) for the MiniCohort QCed data
 
 #?# Type the command you used below: - 3pt
-#TODO not sure about #3
 plink --bfile /projects/bmeg/A7/Mini_cohort --geno 0.05 --maf 0.01 --mind 0.02 --make-bed --out filtered
 ```
 
@@ -174,8 +173,7 @@ hist(chr_info$MAF)
 
 #?# What is the maximum MAF? Why is that? - 1 pt
 max(chr_info$MAF)
-#The max MAF is 0.5
-#TODO why?
+#The max MAF is 0.5. Because the MAF is the minor allele frequency, it cannot possibly have a higher frequency than the major allele frequency (the most common allele). Or else it would not be the minor allele frequency anymore!
 
 ```
 
@@ -223,7 +221,7 @@ pgs <- data.frame(pgs)
 ggplot(pgs, aes(x=pgs))+geom_histogram()
 
 #?# What is the distribution of the tapas PGS? - 1pt
-
+# The distribution looks random. 
 
 ```
 
@@ -239,11 +237,14 @@ ggplot(pgs, aes(x= pgs, y=enjoy)) + geom_point()+geom_smooth()
 
 
 #?# What is the correlation coefficient between the PGS and Tapas enjoyability? Is Spearman or Pearson correlation more appropriate here? Why? - 3 pt
-
+cor(pgs$pgs, pgs$enjoy, method = "pearson")
+cor(pgs$pgs, pgs$enjoy, method = "spearman")
+# The Pearson correlation can only be used to evaluate linear relationships between continuous relationships. Since the Tapas enjoyability is discrete, and since from the graph we see that the relationship between the PGS and Tapas enjoyability does not look linear, a Pearson correlation is not appropriate in this case. The Spearman correlation can be use to evaluate monotonic relationships. From the scatterplot the relationship doesn't look monotonic, since as x increases y does not clearly increase or decrease, and fluctuates. We calculated the correlation coefficients using both and found both to be insignificantly correlated (<0.2). 
 
 
 #?# How predictive is the PGS for tapas preference? Include in your answer why do you think it is/isn't accurate and what could affect its predicitvity - 2pt 
-
+# The PGS for tapas preference is not very predictive. 
+#TODO why
 
 ```
 
