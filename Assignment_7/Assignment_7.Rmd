@@ -49,7 +49,7 @@ Before we can start working on the genetic data, we need to ensure that the qual
 
 #?# Type the command you used below: - 3pt
 #TODO not sure about #3
-plink --bfile /projects/bmeg/A7/Mini_cohort --mind 0.05 --maf 0.01 --geno 0.02 --make-bed --out filtered
+plink --bfile /projects/bmeg/A7/Mini_cohort --geno 0.05 --maf 0.01 --mind 0.02 --make-bed --out filtered
 ```
 
 
@@ -141,9 +141,11 @@ ggplot(data = joined_df, aes(PC1, PC2, colour = SuperPopulation))+geom_point()
 #The cohort samples are clustered together on the lefthand side of the graph, near the SAS and AMR superpopulation samples.
 
 #?# Which Population would you use as a reference for imputation?, Why? - 1 pt
-#TODO
+#We can use the population EAS, that is east asian as a reference for imputation. 
+#TODO - gotta do a vibe check for the answer
 
 #?# Do you think looking at the top two PCs is sufficient to tell what population is best? Why/why not? - 2 pt
+#Looking at the top two PCs is sufficient to tell what population is best because PCAs are able to tell which components are able #to demonstrate the given data the best with a minimum number of components.
 #TODO
 
 ```
@@ -154,7 +156,7 @@ Imputation of genetic data is a very computationally intensive analysis, that ca
 
 ```{r}
 ## Load the Mini_cohort_chr17_imputation_results.info.gz file to your Rstudio environment 
-# chr_info <- read.table(file = "Mini_cohort_chr17_imputation_results.info.gz", header = TRUE)
+chr_info <- read.table(file = "Mini_cohort_chr17_imputation_results.info.gz", header = TRUE)
 ## Use the information in the file to answer the following questions. Accompany each of the answers with the code you used to get to them and a brief explanation of your thought process behind.
 #?# What is the percentage of imputed SNPs? 0.5 pt
 print(length( which( (chr_info$Genotyped == "Imputed") ))/length(chr_info$Genotyped))
@@ -202,14 +204,23 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 
 ## Using the base PRS formula outlined below, calculate the Tapas enjoyability PGS for the individuals in the Mini Cohort 
 #?# Include your rationale and the documented code you used - 5pt
-
-
-
+mc_snp <- read.table(file = "MiniCohort_Tapas_SNPdosages.txt", header = TRUE)
+tapas <- read.table(file="Tapas_enjoyability_GWAS_sumStats.txt", header = TRUE)
+#basically multiply mc_snp by tapas with, rows of tapas with the respective mc_snp columns
+cut_snp <- mc_snp[,-1]
+cut_snp <- cut_snp[,-1]
+columns <- colnames(cut_snp)
+pgs <- c(1:63) #random values to start with
+for (i in 1:nrow(cut_snp)){
+  val <- sum(cut_snp[i,]*tapas$Effect_Size)
+  pgs[i] <- val
+}
+print(pgs)
 #?# Use ggplot to plot the distribution of the Tapas PGS: - 2 pt
 ## Include the code and the graph in your analysis! 
 ## Tip: http://www.cookbook-r.com/Graphs/Plotting_distributions_(ggplot2)/
- 
-
+pgs <- data.frame(pgs)
+ggplot(pgs, aes(x=pgs))+geom_histogram()
 
 #?# What is the distribution of the tapas PGS? - 1pt
 
@@ -223,7 +234,8 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 ## This tapas likability is captured in the "Tapas_enjoyability" column of the -MiniCohort_Tapas_SNPdosages.txt- file. 
 #?# Make a scatterplot with a linear regression line, where x is the Tapas-PGS and y is their actual Tapas enjoyability - 2 pt
 ## Tip: http://www.sthda.com/english/wiki/ggplot2-scatter-plots-quick-start-guide-r-software-and-data-visualization
-
+pgs$enjoy <- mc_snp$Tapas_enjoyability
+ggplot(pgs, aes(x= pgs, y=enjoy)) + geom_point()+geom_smooth()
 
 
 #?# What is the correlation coefficient between the PGS and Tapas enjoyability? Is Spearman or Pearson correlation more appropriate here? Why? - 3 pt
@@ -240,9 +252,8 @@ PGS are calculated by multiplying the effect sizes of each SNP by the dosage of 
 
 Following completion of your assignment, please fill out this section with the authors and their contributions to the assignment.  If you worked alone, only the author (e.g. your name and student ID) should be included.
 
-Authors: Name1 (studentID1) and Name2 (studentID2)
+Authors: Alice Zhang (52721552) and Abhishek Dhir (87603866)
 
-Contributions: (example) N1 and N2 worked together on the same computer to complete the assignment. N1 typed for the first half and N2 typed for the second half. 
-
+Contributions: Alice and Abhishek worked together asynchronously on the assignment together and then pushed the combined changes in the end, after a synchronous working session.
 
 
