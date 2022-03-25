@@ -1,0 +1,25 @@
+---
+title: "Project"
+output:
+  github_document:
+    toc: true
+    toc_depth: 4
+---
+From the paper:
+
+Align ChIP-seq reads to the Arabidopsis reference genome (TAIR10) by Bowtie with at most 2 mismatches Visualize results  with IGV software
+Reads that appeared more than twice at the same position on the same strand were discarded to remove PCR duplication
+MACS2 (Model-based Analysis of ChIP-seq) [32] was used to identify peaks using a q-value cutoff of 0.05.
+
+To identify possible binding motif of the WRKY33 transcription factor, the ChIP peak sequences were subjected to MEME (Multiple EM for Motif Elicitation)-ChIP 
+The MEME-ChIP program uses two ab initio motif discovery algorithms: MEME [19], and DREME (Discriminative Regular Expression Motif Elicitation) [33], which uses regular expressions to search for short eukaryotic TF motifs that are missed by MEME.
+
+In order to determine the putative functions of the target gene WRKY33, all identifed genes with ChIP-seq peaks in the upstream promoter region or the potential regulatory region downstream were subjected to annotation of the categories of ontological genes (GO) [20]. The default Fisher’s Exact Test and Benjamini-Yekutieli multiple test correction methods [34] were used to generate p-values for statistical significance and corresponding False Discovery Rate (FDR) values.
+
+Total RNA was isolated using the Biospin Plant Total RNA Extraction kit according to the user manual (Bioer Technology; Hangzhou, China), from the pooled three-week old rosette leaves of Col and 35S:FLAG-WRKY33 plants, and 1–2 μg total RNA was used for reverse transcription, using the PrimeScript RT reagent kit (Takara Cat# RR047A). A QuantiNova SYBR Green PCR Kit was used for qPCR reactions with qPCR-specific primers. The expression levels of putative target genes were compared with Arabidopsis ACTIN genes.
+
+```{r}
+plot(cars)
+```
+
+
