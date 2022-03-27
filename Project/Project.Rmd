@@ -11,6 +11,24 @@ Align ChIP-seq reads to the Arabidopsis reference genome (TAIR10) by Bowtie with
 Reads that appeared more than twice at the same position on the same strand were discarded to remove PCR duplication
 MACS2 (Model-based Analysis of ChIP-seq) [32] was used to identify peaks using a q-value cutoff of 0.05.
 
+Downloaded reference TAIR-10 genome from: https://support.illumina.com/sequencing/sequencing_software/igenome.html
+
+Downloaded data from study using accession number CRA003775 from:
+https://bigd.big.ac.cn/gsa
+
+```{bash, eval=FALSE}
+# upload files to remote server
+scp /Users/alicezhang/Documents/400E_Assignments/Project/* alzhang_bmeg22@orca1.bcgsc.ca:/home/alzhang_bmeg22
+
+scp -r /Users/alicezhang/Downloads/Arabidopsis_thaliana_Ensembl_TAIR10/Arabidopsis_thaliana/Ensembl/TAIR10/Sequence/Bowtie2Index alzhang_bmeg22@orca1.bcgsc.ca:/home/alzhang_bmeg22/genome
+
+# align ChIp-seq reads to reference genome 
+#Paired-end (PE) analysis
+bowtie2 -x /home/alzhang_bmeg22/genome/genome -1 /home/alzhang_bmeg22/CRR242640.fq.gz	 -2 /home/alzhang_bmeg22/CRR242641.fq.gz -S alignPE.sam
+#Single-end (SE) analysis
+bowtie2 -x /home/alzhang_bmeg22/genome/genome -U /home/alzhang_bmeg22/CRR242640.fq.gz -S alignSE.sam
+
+```
 To identify possible binding motif of the WRKY33 transcription factor, the ChIP peak sequences were subjected to MEME (Multiple EM for Motif Elicitation)-ChIP 
 The MEME-ChIP program uses two ab initio motif discovery algorithms: MEME [19], and DREME (Discriminative Regular Expression Motif Elicitation) [33], which uses regular expressions to search for short eukaryotic TF motifs that are missed by MEME.
 
@@ -19,7 +37,9 @@ In order to determine the putative functions of the target gene WRKY33, all iden
 Total RNA was isolated using the Biospin Plant Total RNA Extraction kit according to the user manual (Bioer Technology; Hangzhou, China), from the pooled three-week old rosette leaves of Col and 35S:FLAG-WRKY33 plants, and 1–2 μg total RNA was used for reverse transcription, using the PrimeScript RT reagent kit (Takara Cat# RR047A). A QuantiNova SYBR Green PCR Kit was used for qPCR reactions with qPCR-specific primers. The expression levels of putative target genes were compared with Arabidopsis ACTIN genes.
 
 ```{r}
-plot(cars)
+library(tidyverse)
+library(microseq)
+# CRR0 <- readFastq('CRR242640.fq.gz')
 ```
 
 
