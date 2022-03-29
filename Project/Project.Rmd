@@ -53,7 +53,7 @@ bamCoverage -b align_SE_filtered.bam -o alignSE_filetered.bw
 #not a robust way, but easyyy
 
  scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/alignSE_filetered.bw .
- % scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/alignPE_filetered.bw .
+ scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/alignPE_filetered.bw .
 
 #install macs2 and call peaks
 conda install -c bioconda macs2
