@@ -58,9 +58,17 @@ bamCoverage -b align_SE_filtered.bam -o alignSE_filetered.bw
 #install macs2 and call peaks
 conda install -c bioconda macs2
 #TODO macs2 not working for me rn for some reason
-macs2 callpeak -q 0.05 -t align_PE_filtered.bam -c alignPE.bam -n alignPE
+macs2 callpeak -q 0.05 -t align_PE_filtered.bam -c alignPE.bam -n alignPE --nomodel --extsize 200
+#for this one nomodel works coz of the reason provided in the github link 
+# http://seqanswers.com/forums/showthread.php?t=69769     ;) nice numbers in the link
 macs2 callpeak -q 0.05 -t align_SE_filtered.bam -c alignSE.bam -n alignSE 
 
+
+#motif analysis required fasta files, could not really find packages to convert bed files to fasta so used this
+#script found on stackexchange
+#https://bioinformatics.stackexchange.com/questions/5368/how-to-convert-bed-file-to-fasta-file
+
+perl bed2faidxsta.pl align_peaks_PE_summits.bed peaks_PE.fa
 #perform motif analysis on peaks 
 
 ```
