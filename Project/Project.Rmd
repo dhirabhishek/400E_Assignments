@@ -22,46 +22,67 @@ scp /Users/alicezhang/Documents/400E_Assignments/Project/* alzhang_bmeg22@orca1.
 
 scp -r /Users/alicezhang/Downloads/Arabidopsis_thaliana_Ensembl_TAIR10/Arabidopsis_thaliana/Ensembl/TAIR10/Sequence/Bowtie2Index alzhang_bmeg22@orca1.bcgsc.ca:/home/alzhang_bmeg22/genome
 
-# align ChIp-seq reads to reference genome 
-#Paired-end (PE) analysis
-bowtie2 -x /home/alzhang_bmeg22/genome/genome -1 /home/alzhang_bmeg22/CRR242640.fq.gz	 -2 /home/alzhang_bmeg22/CRR242641.fq.gz -S alignPE.sam
-#Single-end (SE) analysis
-bowtie2 -x /home/alzhang_bmeg22/genome/genome -U /home/alzhang_bmeg22/CRR242640.fq.gz -S alignSE.sam
 
-#convert sam files to bam
-samtools view -S -b -h alignPE.sam > alignPE.bam
+#align the input file
+bowtie2 -x genome/genome -U CRR242641.fq -S input_align.sam
+#align the Chip seq file
+bowtie2 -x genome/genome -U CRR242640.fq -S align.sam
+
+#convert sam files to bam and also sort them 
+samtools view -S -b -h align.sam > alignPE.bam
 samtools view -S -b -h alignSE.sam > alignSE.bam
 # i think we should do this instead
-samtools sort alignSE.sam -o alignSE.bam
-samtools sort alignPE.sam -o alignPE.bam
+samtools sort align.sam -o align.bam
+samtools sort input_align.sam -o input_align.bam
 
 #filter only uniquely mapped reads with at most 2 mismatches
-sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h --format=bam  alignPE.bam  > align_PE_filtered.bam
-sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h --format=bam  alignSE.bam  > align_SE_filtered.bam
+sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h --format=bam align.bam > filtered_align.bam
+sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h --format=bam input_align.bam > filtered_input_align.bam
+
 
 #Create index to create bigwig files
-samtools index -b align_PE_filtered.bam
-samtools index -b align_SE_filtered.bam
+samtools index -b filtered_align.bam
+samtools index -b filtered_input_align.bam
 
 #creating the bw files
-bamCoverage -b align_PE_filtered.bam -o alignPE_filetered.bw
-bamCoverage -b align_SE_filtered.bam -o alignSE_filetered.bw
+bamCoverage -b filtered_align.bam -o filtered_align.bw
+bamCoverage -b filtered_input_align.bam -o filtered_input_align.bw
 
 #move files to local to view in IGV
 
 # So i just open the terminal where i want to download files and use "." instead of directory address, makes things easier
 #not a robust way, but easyyy
 
- scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/alignSE_filetered.bw .
- scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/alignPE_filetered.bw .
+ scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/filtered_align.bw .
+ scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/filtered_input_align.bw .
 
 #install macs2 and call peaks
 conda install -c bioconda macs2
 #TODO macs2 not working for me rn for some reason
-macs2 callpeak -q 0.05 -t align_PE_filtered.bam -c alignPE.bam -n alignPE --nomodel --extsize 200
+macs2 callpeak -q 0.05 -t filtered_align.bam -c filtered_input_align.bam -n peaks_align
+
+
+#to convert fq file to fa for motif analysis
+#install seqtk, library which will help do the conversion
+conda install -c bioconda seqtk
+
+#convert the file
+seqtk seq -a CRR242640.fq > CRR242640.fa
+
+
+
+
+
+
+
+#installation 
+#apart from meme
+
+conda install -c conda-forge -c bioconda -c defaults prokka
+
 #for this one nomodel works coz of the reason provided in the github link 
 # http://seqanswers.com/forums/showthread.php?t=69769     ;) nice numbers in the link
-macs2 callpeak -q 0.05 -t align_SE_filtered.bam -c alignSE.bam -n alignSE 
+
 
 
 #motif analysis required fasta files, could not really find packages to convert bed files to fasta so used this
