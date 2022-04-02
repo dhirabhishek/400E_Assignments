@@ -79,7 +79,7 @@ seqtk seq -a CRR242640.fq > CRR242640.fa
 scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/peaks_align_summits.bed .
 ```
 
-```{r}
+```{r echo=T, results='hide'}
 # install.packages("igraph", type = "binary") (nonbinary didn't work for me for igraph)
 library(dplyr)
 library(igraph)
@@ -90,21 +90,27 @@ library(clusterProfiler)
 library(rtracklayer)
 library(GenomicRanges)
 library(regioneR)
+library(VennDetail)
 
 bed <- as.data.frame(read.table("peaks_align_summits.bed",header = TRUE, sep="\t",stringsAsFactors=FALSE, quote=""))
 
-gr_obj =  import("peaks_align_summits.bed")
-gr_list = split(gr_obj, gr_obj$name)
+res <- 
+  lapply(split(bed, bed$peaks_align_peak_1), function(i){
+    GRanges(seqnames = i$X2,
+            ranges = IRanges(start = i$X10086,
+                             end = i$X10087,
+                             names = i$peaks_align_peak_1))
+  })
 
-covplot(gr_list, weightCol="X77.1138")
+res
+```
 
+```{r}
+covplot(res)
+# vennpie(res)
 ```
 
 ```{bash, eval=FALSE}
-
-
-
-
 
 #installation 
 #apart from meme
