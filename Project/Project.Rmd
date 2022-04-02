@@ -55,7 +55,13 @@ bamCoverage -b filtered_input_align.bam -o filtered_input_align.bw
 
  scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/filtered_align.bw .
  scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/filtered_input_align.bw .
+```
 
+```{}
+![](peaks_summary.png)
+```
+
+```{bash, eval=FALSE}
 #install macs2 and call peaks
 conda install -c bioconda macs2
 #TODO macs2 not working for me rn for some reason
@@ -69,7 +75,32 @@ conda install -c bioconda seqtk
 #convert the file
 seqtk seq -a CRR242640.fq > CRR242640.fa
 
+#move bed file to local
+scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/peaks_align_summits.bed .
+```
 
+```{r}
+# install.packages("igraph", type = "binary") (nonbinary didn't work for me for igraph)
+library(dplyr)
+library(igraph)
+
+#install these with Bioconductor, don't update igraph
+library(ChIPseeker)
+library(clusterProfiler)
+library(rtracklayer)
+library(GenomicRanges)
+library(regioneR)
+
+bed <- as.data.frame(read.table("peaks_align_summits.bed",header = TRUE, sep="\t",stringsAsFactors=FALSE, quote=""))
+
+gr_obj =  import("peaks_align_summits.bed")
+gr_list = split(gr_obj, gr_obj$name)
+
+covplot(gr_list, weightCol="X77.1138")
+
+```
+
+```{bash, eval=FALSE}
 
 
 
