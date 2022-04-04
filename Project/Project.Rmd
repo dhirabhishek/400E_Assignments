@@ -77,6 +77,10 @@ seqtk seq -a CRR242640.fq > CRR242640.fa
 
 #move bed file to local
 scp adhir_bmeg22@orca1.bcgsc.ca:/home/adhir_bmeg22/project/peaks_align_summits.bed .
+
+#changing bed file and bam to fasta for meme
+samtools ampliconclip -b peaks_align_summits.bed filtered_align.bam -o filtered.fa
+#ran meme locally and on meme server
 ```
 
 ```{r echo=T, results='hide'}
