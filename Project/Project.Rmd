@@ -23,24 +23,26 @@ bowtie2 -x genome/genome -U CRR242641.fq -S input_align.sam
 bowtie2 -x genome/genome -U CRR242640.fq -S align.sam
 
 #convert sam files to bam and also sort them 
-samtools view -S -b -h align.sam > alignPE.bam
-samtools view -S -b -h alignSE.sam > alignSE.bam
-# i think we should do this instead
-samtools sort align.sam -o align.bam
-samtools sort input_align.sam -o input_align.bam
+samtools view -S -b -h -@ 32align.sam > align.bam
+samtools view -S -b -h -@ 32 input_align.sam > input_align.bam
 
 #filter only uniquely mapped reads with at most 2 mismatches
-sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h --format=bam align.bam > filtered_align.bam
-sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h --format=bam input_align.bam > filtered_input_align.bam
+sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h -t 32 --format=bam align.bam > filtered_align.bam
+sambamba view -F "[XS] == null and not unmapped and [NM] <=2)" -h -t 32 --format=bam input_align.bam > filtered_input_align.bam
 
+#gotta sort for the index thing
+sort filtered_align.bam -o sorted_filtered_align.bam 
+sort filtered_align.bam -o sorted_filtered_input_align.bam 
 
 #Create index to create bigwig files
-samtools index -b filtered_align.bam
-samtools index -b filtered_input_align.bam
+samtools index -b -@ 32 sorted_filtered_align.bam
+samtools index -b -@ 32 sorted_filtered_input_align.bam
+
 
 #creating the bw files
-bamCoverage -b filtered_align.bam -o filtered_align.bw
-bamCoverage -b filtered_input_align.bam -o filtered_input_align.bw
+
+bamCoverage -b sorted_filtered_align.bam -o filtered_align.bw --numberOfProcessors max
+bamCoverage -b sorted_filtered_input_align.bam -o filtered_input_align.bw --numberOfProcessors max
 
 #move files to local to view in IGV
 
@@ -59,7 +61,11 @@ bamCoverage -b filtered_input_align.bam -o filtered_input_align.bw
 #install macs2 and call peaks
 conda install -c bioconda macs2
 #TODO macs2 not working for me rn for some reason
-macs2 callpeak -q 0.05 -t filtered_align.bam -c filtered_input_align.bam -n peaks_align
+macs2 callpeak -q 0.05 -t sorted_filtered_align.bam -c sorted_filtered_input_align.bam -n peaks_align 
+
+#fasta for motif analysis
+bedtools getfasta -fi ../project/whole_genome.fa -bed peaks_align_peaks.narrowPeak -fo fastaSeqs.fa
+
 
 
 #to convert fq file to fa for motif analysis
@@ -93,7 +99,7 @@ library(VennDetail)
 ```
 
 ```{r}
-bed2 <- as.data.frame(read.table("peaks_broad.bed",header = FALSE, sep="\t"))
+bed2 <- as.data.frame(read.table("peaks_align_summits.bed",header = FALSE, sep="\t"))
 res2 <- 
   lapply(split(bed2, bed2$V1), function(i){
     GRanges(seqnames = i$V1,
@@ -150,6 +156,24 @@ conda install -c conda-forge -c bioconda -c defaults prokka
 perl bed2faidxsta.pl align_peaks_PE_summits.bed peaks_PE.fa
 #perform motif analysis on peaks 
 
+```
+
+```{r}
+#useless but adding, just coz
+library(tidyverse)
+library(microseq)
+#BiocManager::install("BSgenome.Athaliana.TAIR.TAIR9")
+library(BSgenome.Athaliana.TAIR.TAIR9)
+genome <- BSgenome.Athaliana.TAIR.TAIR9
+summitSeq = get_peak_summit_seq(file = "peaks_align_peaks.narrowPeak", peakFormat = "narrowPeak",genome = genome)
+# CRR0 <- readFastq('CRR242640.fq.gz')
+```
+
+```{r}
+# https://rdrr.io/github/lakhanp1/chipmine/man/get_peak_summit_seq.html
+
+#install.packages("remotes")
+#remotes::install_github("lakhanp1/chipmine")
 ```
 # Authors and contributions
 
